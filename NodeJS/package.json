@@ -1,0 +1,19 @@
+{
+  "name": "di_ichimohu_clouds_bot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js"
+  },
+  "author": "Ömer Faruk Boran",
+  "license": "ISC",
+  "dependencies": {
+    "binance-api-node": "^0.12.2",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "mongoose": "^6.8.3",
+    "morgan": "^1.10.0"
+  }
+}
