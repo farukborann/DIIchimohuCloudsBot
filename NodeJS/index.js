@@ -14,7 +14,7 @@ const Main = async () => {
   })
   Api.Main()
 
-  Binance.StartCalculateIchimoku('BTCUSDT', '1m')
+  Binance.StartCalculateIchimoku('BTCUSDT', '1m', 9, 26)
 }
 
 Main()

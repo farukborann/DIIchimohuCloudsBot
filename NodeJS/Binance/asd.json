@@ -1,0 +1,25 @@
+{
+  "sku": "41001101M",
+  "name": "Digital Bathroom Carpet Closet Set 2 Piece Mat Set Bs227 60x90cm + 60x60cm",
+  "description": "Digital Bathroom Carpet Closet Set 2 Piece Mat Set BS227 60x90cm + 60x60cm",
+  "variants": [
+    {
+      "extraImages": ["https://cdn.dsmcdn.com/ty3/product/media/images/20200602/22/2136481/72610560/2/2_org_zoom.jpg"],
+      "inventory": 1000,
+      "size": "",
+      "inStock": true,
+      "sku": "41001101-V0",
+      "oldPrice": 129.99,
+      "price": "32.20",
+      "declaredValue": "32.20",
+      "msrPrice": "64.40",
+      "currency": "EUR",
+      "shippingLength": 200,
+      "shippingWidth": 15,
+      "shippingHeight": 15,
+      "shippingWeight": 2
+    }
+  ],
+  "extraImages": [null],
+  "storeId": "6334da263fd02e056b946968"
+}
