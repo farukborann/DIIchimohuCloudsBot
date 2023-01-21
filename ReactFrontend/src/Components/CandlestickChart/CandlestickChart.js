@@ -1,8 +1,8 @@
 import ApexChart from 'react-apexcharts'
-import Api from '../Others/Api'
+import Api from '../../Others/Api'
 import { useEffect, useState } from 'react'
 
-const getOptions = (title) => {
+const GetOptions = (title) => {
   return {
     title: {
       text: title,
@@ -21,14 +21,14 @@ const getOptions = (title) => {
   }
 }
 
-const Chart = ({ SelectedPair, SelectedInterval, Updater, className, height, width }) => {
-  const [Options, setOptions] = useState(getOptions(''))
+const Chart = ({ SelectedPair, SelectedInterval, Updater, SetUpdater, className, height, width }) => {
+  const [Options, SetOptions] = useState(GetOptions(''))
 
   const [KlineSerie, SetKlineSerie] = useState([])
   const [ConversionLineSerie, SetConversionLineSerie] = useState([])
   const [BaseLineSerie, SetBaseLineSerie] = useState([])
 
-  useEffect(() => {
+  const Update = () => {
     if (!SelectedPair || !SelectedInterval) return
 
     Api.GetIchimoku(SelectedPair, SelectedInterval)
@@ -88,9 +88,23 @@ const Chart = ({ SelectedPair, SelectedInterval, Updater, className, height, wid
         SetBaseLineSerie(baseSerie)
       })
       .then(() => {
-        setOptions(getOptions(SelectedPair + ' ' + SelectedInterval))
+        SetOptions(GetOptions(SelectedPair + ' ' + SelectedInterval))
       })
+  }
+
+  useEffect(() => {
+    Update()
   }, [SelectedPair, SelectedInterval])
+
+  useEffect(() => {
+    if (Updater !== true) return
+    try {
+      Update()
+      SetUpdater(false)
+    } catch (ex) {
+      SetUpdater(false)
+    }
+  }, [Updater])
 
   return <ApexChart options={Options} series={[KlineSerie, ConversionLineSerie, BaseLineSerie]} className={className} height={height} width={width} />
 }
