@@ -2,6 +2,7 @@ const DotEnv = require('dotenv') // Environment file importer
 const Api = require('./Api')
 const Database = require('./Database')
 const Binance = require('./Binance')
+const BotManager = require('./BotManager')
 
 //Initilaziation
 const Main = async () => {
@@ -14,7 +15,7 @@ const Main = async () => {
   })
   Api.Main()
 
-  Binance.StartCalculateIchimoku('BTCUSDT', '1m', 9, 26)
+  BotManager.StartBot({ symbol: 'BTCUSDT', interval: '1m', conversionLength: 9, baseLength: 26 })
 }
 
 Main()

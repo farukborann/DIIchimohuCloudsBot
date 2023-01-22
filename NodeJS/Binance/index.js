@@ -2,9 +2,6 @@ const Binance = require('binance-api-node')
 const Ichimoku = require('./Ichimoku')
 const Helpers = require('./Helpers')
 
-let IchimokuCalculations = []
-module.exports.IchimokuCalculations = IchimokuCalculations
-
 module.exports.Intervals = {
   oneMunite: '1m',
   threeMunites: '3m',
@@ -57,32 +54,30 @@ module.exports.GetExchangeInfo = async () => {
   return ExchangeInfo
 }
 
-module.exports.StartCalculateIchimoku = async (symbol, interval, conversionLength, baseLength) => {
-  if (IchimokuCalculations.some((Calc) => Calc.symbol === symbol && Calc.interval === interval)) return
-
+module.exports.StartCalculateIchimoku = async (symbol, interval, conversionLength, baseLength, crossCallback) => {
   let klineCount = Math.max(conversionLength, baseLength)
-  let klines = (await BinanceClient.futuresCandles({ symbol, interval, limit: klineCount * 2 })).map((_kline) => {
+  let Klines = (await BinanceClient.futuresCandles({ symbol, interval, limit: klineCount * 2 })).map((_kline) => {
     let kline = { openTime: _kline.openTime, closeTime: _kline.closeTime, open: parseFloat(_kline.open), high: parseFloat(_kline.high), low: parseFloat(_kline.low), close: parseFloat(_kline.close) }
     return kline
   })
 
-  for (let i = klineCount; i < klines.length; i++) {
-    let { conversionValue, baseValue } = Ichimoku.Calculate(klines.slice(i - klineCount, i), conversionLength, baseLength)
-    klines[i].conversionValue = conversionValue
-    klines[i].baseValue = baseValue
+  for (let i = klineCount; i < Klines.length; i++) {
+    let { conversionValue, baseValue } = Ichimoku.Calculate(Klines.slice(i - klineCount, i), conversionLength, baseLength)
+    Klines[i].conversionValue = conversionValue
+    Klines[i].baseValue = baseValue
   }
 
   let ConnectionClose = BinanceClient.ws.futuresCandles(symbol, interval, (_kline) => {
     if (_kline.isFinal) {
-      if (klines.at(-1).closeTime == _kline.closeTime) {
-        klines.at(-1).high = parseFloat(_kline.high)
-        klines.at(-1).low = parseFloat(_kline.low)
-        klines.at(-1).close = parseFloat(_kline.close)
-        klines.at(-1).open = parseFloat(_kline.open)
+      if (Klines.at(-1).closeTime == _kline.closeTime) {
+        Klines.at(-1).high = parseFloat(_kline.high)
+        Klines.at(-1).low = parseFloat(_kline.low)
+        Klines.at(-1).close = parseFloat(_kline.close)
+        Klines.at(-1).open = parseFloat(_kline.open)
 
-        let { conversionValue, baseValue } = Ichimoku.Calculate(klines.slice(klines.length - klineCount, klines.length), conversionLength, baseLength)
-        klines.at(-1).conversionValue = conversionValue
-        klines.at(-1).baseValue = baseValue
+        let { conversionValue, baseValue } = Ichimoku.Calculate(Klines.slice(Klines.length - klineCount, Klines.length), conversionLength, baseLength)
+        Klines.at(-1).conversionValue = conversionValue
+        Klines.at(-1).baseValue = baseValue
       } else {
         let kline = {
           openTime: _kline.startTime,
@@ -92,35 +87,23 @@ module.exports.StartCalculateIchimoku = async (symbol, interval, conversionLengt
           low: parseFloat(_kline.low),
           close: parseFloat(_kline.close)
         }
-        klines.at(-1).close = kline.open
-        klines.push(kline)
-        klines.splice(0, 1)
+        Klines.at(-1).close = kline.open
+        Klines.push(kline)
+        Klines.splice(0, 1)
 
-        let { conversionValue, baseValue } = Ichimoku.Calculate(klines.slice(klines.length - klineCount, klines.length), conversionLength, baseLength)
+        let { conversionValue, baseValue } = Ichimoku.Calculate(Klines.slice(Klines.length - klineCount, Klines.length), conversionLength, baseLength)
         kline.conversionValue = conversionValue
         kline.baseValue = baseValue
       }
 
-      let lastKline = klines.at(-1)
-      let secondLastKline = klines.at(-2)
+      let lastKline = Klines.at(-1)
+      let secondLastKline = Klines.at(-2)
       let isCrossing = Helpers.DedectIndicatorCrossing(secondLastKline.conversionValue, lastKline.conversionValue, secondLastKline.baseValue, lastKline.baseValue)
-      if (isCrossing === 1) {
-        console.log('Conversion cross base')
-      } else if (isCrossing === 2) {
-        console.log('Base cross conversion')
+      if (isCrossing === 1 || isCrossing === 2) {
+        crossCallback(isCrossing)
       }
     }
-
-    IchimokuCalculations.push({ symbol, interval, conversionLength, baseLength, klines, ConnectionClose })
   })
-}
 
-module.exports.StopCalculateIchimoku = (symbol, interval) => {
-  let CalcIndex = IchimokuCalculations.findIndex((Calc) => Calc.symbol === symbol && Calc.interval === interval)
-  if (CalcIndex === -1) return
-
-  let Calc = IchimokuCalculations[CalcIndex]
-  Calc.ConnectionClose()
-  IchimokuCalculations.splice(CalcIndex, 1)
-  console.log('Websocket connection ended for ' + symbol + ' ' + interval)
+  return { Klines, ConnectionClose }
 }

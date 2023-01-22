@@ -1,23 +1,17 @@
 import axios from 'axios'
-const BinanceBaseUrl = 'http://127.0.0.1:4000/binance'
-
-const GetKlines = async (symbol, interval) => {
-  let result = await axios.post(BinanceBaseUrl + '/public/klines', { symbol, interval })
-  return result.data
-}
+const BaseUrl = 'http://127.0.0.1:4000'
 
 const GetIchimoku = async (symbol, interval) => {
-  let result = await axios.post(BinanceBaseUrl + '/indicators/ichimoku', { symbol, interval })
+  let result = await axios.post(BaseUrl + '/charts/get_chart', { symbol, interval })
   return result.data
 }
 
 const GetExchangeInfo = async () => {
-  let result = await axios.get(BinanceBaseUrl + '/public/exchangeInfo')
+  let result = await axios.get(BaseUrl + '/binance/exchange_info')
   return result.data
 }
 
 export default {
-  GetKlines,
   GetExchangeInfo,
   GetIchimoku
 }

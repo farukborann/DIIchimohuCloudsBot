@@ -6,8 +6,8 @@ module.exports.Calculate = (klines, conversionLength, baseLength) => {
   let conversionPeriots = klines.slice(klines.length - conversionLength, klines.length)
   let basePeriots = klines.slice(klines.length - baseLength, klines.length)
 
-  let conversionResults = getHighLow(conversionPeriots)
-  let baseResults = getHighLow(basePeriots)
+  let conversionResults = GetHighLow(conversionPeriots)
+  let baseResults = GetHighLow(basePeriots)
 
   let conversionValue = (conversionResults.high + conversionResults.low) / 2
   let baseValue = (baseResults.high + baseResults.low) / 2
@@ -15,7 +15,7 @@ module.exports.Calculate = (klines, conversionLength, baseLength) => {
   return { conversionValue: parseFloat(conversionValue.toFixed(2)), baseValue: parseFloat(baseValue.toFixed(2)) }
 }
 
-const getHighLow = (klines) => {
+const GetHighLow = (klines) => {
   let high = klines[0].high
   let low = klines[0].low
 

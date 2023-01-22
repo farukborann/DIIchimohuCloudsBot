@@ -42,7 +42,7 @@ const Page = () => {
           </div>
         </div>
         <br></br>
-        <BotManger className="float-left w-[810px] h-[500px]" />
+        <BotManger className="float-left w-[810px] h-fit" />
       </div>
     </>
   )

@@ -1,5 +1,6 @@
 const Express = require('express') // Http server
 const Morgan = require('morgan') // Terminal logging
+const ChartsRouter = require('./Routes/Charts') // Terminal logging
 const BinanceRouter = require('./Routes/Binance') // Terminal logging
 
 let App
@@ -18,6 +19,7 @@ module.exports.Main = () => {
     next()
   })
 
+  App.use('/charts', ChartsRouter)
   App.use('/binance', BinanceRouter)
 
   //Listen for requests

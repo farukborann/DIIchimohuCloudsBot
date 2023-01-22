@@ -1,12 +1,11 @@
 const { Router } = require('express')
-const PublicRouter = require('./Public')
-const IndicatorsRouter = require('./Indicators')
+const Binance = require('../../../Binance')
 
-//Initilaziation
 const router = Router()
 
-//Routes
-router.use('/public', PublicRouter)
-router.use('/indicators', IndicatorsRouter)
+router.get('/exchange_info', async (req, res) => {
+  let ExchangeInfo = await Binance.GetExchangeInfo()
+  return res.json(ExchangeInfo)
+})
 
 module.exports = router
