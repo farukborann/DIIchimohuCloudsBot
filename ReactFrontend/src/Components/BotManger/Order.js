@@ -1,18 +1,11 @@
-import { useState } from 'react'
-
 const Order = ({ Values, SetValues, className }) => {
-  const [IsLimitOrder, SetIsLimitOrder] = useState(Values.IsLimitOrder)
-  const [TPOrder, SetTPOrder] = useState(Values.TPOrder)
-  const [SLOrder, SetSLOrder] = useState(Values.SLOrder)
-
   return (
     <div className={className}>
       <select
-        defaultValue={IsLimitOrder ? 'Limit' : 'Market'}
+        defaultValue={Values.OrderType ? 'Limit' : 'Market'}
         onChange={(e) => {
-          if (e.target.value === 'Limit') SetIsLimitOrder(true)
-          else SetIsLimitOrder(false)
-          SetValues({ ...Values, IsLimitOrder })
+          if (e.target.value === 'Limit') SetValues({ ...Values, OrderType: 'Limit' })
+          else SetValues({ ...Values, OrderType: 'Market' })
         }}
       >
         <option>Limit</option>
@@ -28,7 +21,7 @@ const Order = ({ Values, SetValues, className }) => {
         <option>Long</option>
         <option>Short</option>
       </select>
-      {IsLimitOrder ? (
+      {Values.OrderType === 'Limit' ? (
         <>
           <label className="ml-4">Price</label>
           <input
@@ -39,54 +32,48 @@ const Order = ({ Values, SetValues, className }) => {
               SetValues({ ...Values, Price: e.target.value })
             }}
           ></input>
-          <label className="ml-10">Size</label>
-          <input
-            type="number"
-            defaultValue={Values.Size}
-            className="ml-2 border-2 border-gray-300"
-            onChange={(e) => {
-              SetValues({ ...Values, Size: e.target.value })
-            }}
-          ></input>
         </>
       ) : (
-        <>
-          <label className="ml-4">Size</label>
-          <input
-            type="number"
-            defaultValue={Values.Size}
-            className="ml-2 border-2 border-gray-300"
-            onChange={(e) => {
-              SetValues({ ...Values, Price: undefined, Size: e.target.value })
-            }}
-          ></input>
-        </>
+        <></>
       )}
+      <label className="ml-10">Size</label>
+      <input
+        type="number"
+        defaultValue={Values.Size}
+        className="ml-2 border-2 border-gray-300"
+        onChange={(e) => {
+          SetValues({ ...Values, Size: e.target.value })
+        }}
+      ></input>
       <br></br>
       <br></br>
       <label className="ml-5">
         <input
-          defaultChecked={Values.TPOrder}
+          defaultChecked={Values.TPOrder.IsActive}
           type="checkbox"
           className="mr-1"
           onChange={(e) => {
-            SetTPOrder(e.target.checked)
+            let _Values = { ...Values }
+            _Values.TPOrder.IsActive = e.target.checked
+            SetValues(_Values)
           }}
         ></input>
         TP
       </label>
       <label className="ml-5">
         <input
-          defaultChecked={Values.SLOrder}
+          defaultChecked={Values.SLOrder.IsActive}
           type="checkbox"
           className="mr-1"
           onChange={(e) => {
-            SetSLOrder(e.target.checked)
+            let _Values = { ...Values }
+            _Values.SLOrder.IsActive = e.target.checked
+            SetValues(_Values)
           }}
         ></input>
         SL
       </label>
-      {TPOrder ? (
+      {Values.TPOrder.IsActive ? (
         <>
           <label className="ml-4">
             Take Profit
@@ -95,7 +82,9 @@ const Order = ({ Values, SetValues, className }) => {
               defaultChecked={Values.SLOrder}
               className="ml-1 border-2 border-gray-300"
               onChange={(e) => {
-                SetSLOrder(e.target.checked)
+                let _Values = { ...Values }
+                _Values.TPOrder.Price = e.target.value
+                SetValues(_Values)
               }}
             ></input>
           </label>
@@ -103,7 +92,7 @@ const Order = ({ Values, SetValues, className }) => {
       ) : (
         <></>
       )}
-      {SLOrder ? (
+      {Values.SLOrder.IsActive ? (
         <>
           <label className="ml-4">
             Stop Loss
@@ -112,7 +101,9 @@ const Order = ({ Values, SetValues, className }) => {
               defaultChecked={Values.SLOrder}
               className="ml-1 border-2 border-gray-300"
               onChange={(e) => {
-                SetSLOrder(e.target.checked)
+                let _Values = { ...Values }
+                _Values.SLOrder.Price = e.target.value
+                SetValues(_Values)
               }}
             ></input>
           </label>

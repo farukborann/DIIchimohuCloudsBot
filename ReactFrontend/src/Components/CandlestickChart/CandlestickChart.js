@@ -102,6 +102,7 @@ const Chart = ({ SelectedPair, SelectedInterval, Updater, SetUpdater, className,
       Update()
       SetUpdater(false)
     } catch (ex) {
+      console.log(ex)
       SetUpdater(false)
     }
   }, [Updater])

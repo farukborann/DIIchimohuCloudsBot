@@ -31,6 +31,7 @@ module.exports.Main = async ({ apiKey, apiSecret, testMode }) => {
   }
 
   BinanceClient = Binance.default(Settings)
+  module.exports.Client = BinanceClient
 
   let TestConnection = await BinanceClient.futuresPing()
   if (TestConnection === true) {

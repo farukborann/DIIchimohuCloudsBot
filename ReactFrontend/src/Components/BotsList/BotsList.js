@@ -2,18 +2,12 @@ import Api from '../../Others/Api'
 import Order from './Order'
 import { useEffect, useState } from 'react'
 
-const BotManager = ({ SelectedPair, SelectedInterval, SetChartUpdater, className }) => {
-  const [IndicatorValues, SetIndicatorValues] = useState({ CLL: 9, BLL: 26 })
-  const [T2BCross, SetT2BCross] = useState({ OrderType: 'Limit', Price: 0, Size: 0, Side: 'Long', TPOrder: { IsActive: false }, SLOrder: { IsActive: false } })
-  const [B2TCross, SetB2TCross] = useState({ OrderType: 'Limit', Price: 0, Size: 0, Side: 'Long', TPOrder: { IsActive: false }, SLOrder: { IsActive: false } })
-
-  const Update = () => {
-    if (!SelectedPair || !SelectedInterval) return
-  }
+const BotsList = ({ Updater, SetUpdater, className }) => {
+  const Update = () => {}
 
   useEffect(() => {
     Update()
-  }, [SelectedPair, SelectedInterval])
+  }, [Updater])
 
   return (
     <div className={'p-5 border-2 border-gray-300 ' + className}>
@@ -72,4 +66,4 @@ const BotManager = ({ SelectedPair, SelectedInterval, SetChartUpdater, className
   )
 }
 
-export default BotManager
+export default BotsList

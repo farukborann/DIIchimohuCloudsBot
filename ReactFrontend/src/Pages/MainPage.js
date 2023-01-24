@@ -9,8 +9,7 @@ const Page = () => {
   const [SelectedPair, SetSelectedPair] = useState('')
   const [SelectedInterval, SetSelectedInterval] = useState('')
 
-  const [ChartUpdater, SetChartUpdater] = useState('')
-
+  const [ChartUpdater, SetChartUpdater] = useState(false)
   const AutoChartUpdater = () => {
     SetChartUpdater(true)
     setTimeout(() => {
@@ -42,7 +41,7 @@ const Page = () => {
           </div>
         </div>
         <br></br>
-        <BotManger className="float-left w-[810px] h-fit" />
+        <BotManger className="float-left w-[810px] h-fit" SelectedPair={SelectedPair} SelectedInterval={SelectedInterval} SetChartUpdater={SetChartUpdater} />
       </div>
     </>
   )

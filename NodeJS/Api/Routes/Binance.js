@@ -1,5 +1,5 @@
 const { Router } = require('express')
-const Binance = require('../../../Binance')
+const Binance = require('../../Binance')
 
 const router = Router()
 

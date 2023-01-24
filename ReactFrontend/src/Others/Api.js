@@ -11,7 +11,23 @@ const GetExchangeInfo = async () => {
   return result.data
 }
 
+const StartBot = async (data) => {
+  let result = await axios.post(BaseUrl + '/bots/start', data)
+  return result.data
+}
+
+// const StopBot = async (data) => {
+//   let result = await axios.post(BaseUrl + '/bots/start', data)
+//   return result.data
+// }
+
+// const GetBot = async (data) => {
+//   let result = await axios.post(BaseUrl + '/bots/start', data)
+//   return result.data
+// }
+
 export default {
   GetExchangeInfo,
-  GetIchimoku
+  GetIchimoku,
+  StartBot
 }
