@@ -6,23 +6,27 @@ const Chart = ({ SetSelectedPair, className }) => {
 
   useEffect(() => {
     Api.GetExchangeInfo().then((exchangeInfo) => {
-      setPairs(exchangeInfo.symbols)
+      setPairs(
+        exchangeInfo.symbols.map((Pair) => {
+          return { Symbol: Pair.symbol }
+        })
+      )
     })
   }, [])
 
   return (
     <select
       name="Pairs"
-      size="75"
+      size="55"
       className={'p-2 ' + className}
       onChange={(e) => {
         SetSelectedPair(e.target.value)
       }}
     >
-      {Pairs.map((pair) => {
+      {Pairs.map((Pair) => {
         return (
-          <option value={pair.symbol} key={pair.symbol}>
-            {pair.symbol}
+          <option value={Pair.Symbol} key={Pair.Symbol}>
+            {Pair.Symbol}
           </option>
         )
       })}

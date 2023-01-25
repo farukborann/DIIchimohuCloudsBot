@@ -2,12 +2,32 @@ import Api from '../../Others/Api'
 import Order from './Order'
 import { useEffect, useState } from 'react'
 
-const BotsList = ({ Updater, SetUpdater, className }) => {
-  const Update = () => {}
+const BotManager = ({ SelectedPair, SelectedInterval, SetUpdater, className }) => {
+  const [IndicatorValues, SetIndicatorValues] = useState({ CLL: 9, BLL: 26 })
+  const [T2BCross, SetT2BCross] = useState({
+    OrderType: 'Limit',
+    Price: -1,
+    Size: 0,
+    Side: 'Long',
+    TPOrder: { IsActive: false, Price: 2, PercentMode: true, WorkingType: 'Mark' },
+    SLOrder: { IsActive: false, Price: 2, PercentMode: true, WorkingType: 'Mark' }
+  })
+  const [B2TCross, SetB2TCross] = useState({
+    OrderType: 'Limit',
+    Price: -1,
+    Size: 0,
+    Side: 'Long',
+    TPOrder: { IsActive: false, Price: 2, PercentMode: true, WorkingType: 'Mark' },
+    SLOrder: { IsActive: false, Price: 2, PercentMode: true, WorkingType: 'Mark' }
+  })
+
+  const Update = () => {
+    if (!SelectedPair || !SelectedInterval) return
+  }
 
   useEffect(() => {
     Update()
-  }, [Updater])
+  }, [SelectedPair, SelectedInterval])
 
   return (
     <div className={'p-5 border-2 border-gray-300 ' + className}>
@@ -47,15 +67,16 @@ const BotsList = ({ Updater, SetUpdater, className }) => {
 
       <br></br>
 
+      <a>Limit Order Price = -1 → Last Price</a>
       <button
         className="float-right border-2 border-gray-300 p-2"
         onClick={async () => {
-          let data = { symbol: SelectedPair, interval: SelectedInterval, conversionLength: IndicatorValues.CLL, baseLength: IndicatorValues.BLL, cross1order: T2BCross, cross2order: B2TCross }
+          let data = { Symbol: SelectedPair, Interval: SelectedInterval, ConversionLength: IndicatorValues.CLL, BaseLength: IndicatorValues.BLL, Cross1Order: T2BCross, Cross2Order: B2TCross }
           let result = await Api.StartBot(data)
           if (result.error) alert(result.error)
           else {
             setTimeout(() => {
-              SetChartUpdater(true)
+              SetUpdater(true)
             }, 2000)
           }
         }}
@@ -66,4 +87,4 @@ const BotsList = ({ Updater, SetUpdater, className }) => {
   )
 }
 
-export default BotsList
+export default BotManager

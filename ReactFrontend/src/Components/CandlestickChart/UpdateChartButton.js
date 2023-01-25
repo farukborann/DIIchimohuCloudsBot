@@ -1,11 +1,11 @@
 import React from 'react'
 
-const UpdateChartButton = ({ SetChartUpdater }) => {
+const UpdateChartButton = ({ SetUpdater }) => {
   return (
     <button
       className="w-14 h-14 p-2"
       onClick={() => {
-        SetChartUpdater(true)
+        SetUpdater(true)
       }}
     >
       <svg fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">

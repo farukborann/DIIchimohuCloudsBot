@@ -7,11 +7,11 @@ const router = Router()
 
 //Routes
 router.post('/get_chart', async (req, res) => {
-  if (!req.body?.symbol || !req.body?.interval) return res.end()
-  let Bot = BotManager.GetBot(req.body.symbol, req.body.interval)
+  if (!req.body?.Symbol || !req.body?.Interval) return res.end()
+  let Bot = BotManager.GetBot(req.body.Symbol, req.body.Interval)
 
   if (Bot === undefined) {
-    let Klines = await Binance.GetKlines(req.body.symbol, req.body.interval, 75)
+    let Klines = await Binance.GetKlines(req.body.Symbol, req.body.Interval, 75)
     return res.json(Klines)
   }
 
