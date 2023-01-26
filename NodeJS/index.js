@@ -16,6 +16,7 @@ const Main = async () => {
   Api.Main()
 
   // BotManager.StartBot({ symbol: 'BTCUSDT', interval: '1m', conversionLength: 9, baseLength: 26 })
+  // BotManager.Logs.push({ Symbol: 'BTCUSDT', Date: new Date(), Cross: 2 })
 }
 
 Main()

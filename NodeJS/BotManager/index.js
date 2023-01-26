@@ -1,14 +1,23 @@
 const Binance = require('../Binance/')
 
 let Bots = []
+let Logs = []
 let ExchangeInfo
 module.exports.Bots = Bots
+module.exports.Logs = Logs
 
-function RoundStep(qty, stepSize) {
+const CancelOrders = async (Bot) => {
+  if (!Bot.LastOrderIds) return
+
+  await Binance.Client.futuresCancelOrder({ symbol: Bot.Symbol, orderId: Bot.LastOrderIds.MOrderId })
+  await Binance.Client.futuresCancelAllOpenOrders({ symbol: Bot.Symbol })
+}
+
+function RoundStep(Quantity, StepSize) {
   // Integers do not require rounding
-  if (Number.isInteger(qty)) return qty
-  const qtyString = parseFloat(qty).toFixed(16)
-  const desiredDecimals = Math.max(stepSize.indexOf('1') - 1, 0)
+  if (Number.isInteger(Quantity)) return Quantity
+  const qtyString = parseFloat(Quantity).toFixed(16)
+  const desiredDecimals = Math.max(StepSize.indexOf('1') - 1, 0)
   const decimalIndex = qtyString.indexOf('.')
   return parseFloat(qtyString.slice(0, decimalIndex + desiredDecimals + 1))
 }
@@ -140,7 +149,7 @@ const CreateBotOrder = async (Order) => {
   }
 
   console.log(Order.Symbol, ' Orders Success')
-  return { TPOrderId, SLOrderId, MOrderId: MOrder.orderId }
+  return { TPOrderId, SLOrderId, MOrderId }
   // } catch (ex) {
   // }
 }
@@ -153,15 +162,32 @@ module.exports.StartBot = async ({ Symbol, Interval, ConversionLength, BaseLengt
     return { error: 'Symbol has bot' }
   }
 
-  let Calculation = await Binance.StartCalculateIchimoku(Symbol, Interval, ConversionLength, BaseLength, (CrossType) => {
+  let Calculation = await Binance.StartCalculateIchimoku(Symbol, Interval, ConversionLength, BaseLength, async (CrossType) => {
+    let Bot = Bots.find((Bot) => {
+      return Bot.Symbol === Symbol
+    })
+
+    await CancelOrders(Bot)
     if (CrossType === 1) {
-      CreateBotOrder({ ...Cross1Order, Symbol })
+      let LastOrderIds = CreateBotOrder({ ...Cross1Order, Symbol })
+
+      Bot.LastOrderIds = LastOrderIds
+
+      let Now = new Date()
+      Bot.Logs.push({ Date: Now, Cross: 1 })
+      Logs.push({ Symbol, Date: Now, Cross: 1 })
     } else if (CrossType === 2) {
-      CreateBotOrder({ ...Cross1Order, Symbol })
+      let LastOrderIds = CreateBotOrder({ ...Cross1Order, Symbol })
+
+      Bot.LastOrderIds = LastOrderIds
+
+      let Now = new Date()
+      Bot.Logs.push({ Date: Now, Cross: 2 })
+      Logs.push({ Symbol, Date: Now, Cross: 2 })
     }
   })
 
-  Bots.push({ Symbol, Interval, ConversionLength, BaseLength, Cross1Order, Cross2Order, Calculation })
+  Bots.push({ Symbol, Interval, ConversionLength, BaseLength, Cross1Order, Cross2Order, Calculation, Logs: [] })
   return { result: true }
 }
 

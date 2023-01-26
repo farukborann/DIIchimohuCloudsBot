@@ -5,6 +5,7 @@ import PairList from '../Components/PairList'
 import IntervalList from '../Components/IntervalList'
 import BotManger from '../Components/BotManger'
 import BotsList from '../Components/BotsList'
+import BotsLogs from '../Components/BotsLogs'
 
 const Page = () => {
   const [SelectedPair, SetSelectedPair] = useState('')
@@ -23,8 +24,8 @@ const Page = () => {
 
   return (
     <>
-      <div className="flex flex-nowrap float-left m-5">
-        <PairList className="float-left border-2 border-gray-300 h-min outline-none" SetSelectedPair={SetSelectedPair} />
+      <div className="float-left m-5">
+        <PairList className="float-left border-2 border-gray-300  outline-none" SetSelectedPair={SetSelectedPair} />
         <div className="float-left">
           <div className="float-left w-fit h-fit">
             <CandlestickChart
@@ -44,7 +45,12 @@ const Page = () => {
             <BotsList Updater={Updater} SetUpdater={SetUpdater} className="float-left w-[810px] h-[515px]" />
           </div>
           <br></br>
-          <BotManger className="float-left w-[810px] h-fit" SelectedPair={SelectedPair} SelectedInterval={SelectedInterval} SetUpdater={SetUpdater} />
+          <div className="float-left">
+            <BotManger className="float-left w-[810px] h-fit" SelectedPair={SelectedPair} SelectedInterval={SelectedInterval} SetUpdater={SetUpdater} />
+            <div className="float-left w-[810px] h-fit">
+              <BotsLogs className="float-left w-[810px] h-[515px] flex flex-col" Updater={Updater} SetUpdater={SetUpdater} />
+            </div>
+          </div>
         </div>
       </div>
     </>

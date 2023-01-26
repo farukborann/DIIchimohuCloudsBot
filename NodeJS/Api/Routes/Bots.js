@@ -25,4 +25,8 @@ router.post('/stop', async (req, res) => {
   return res.json(BotManager.StopBot(req.body.Symbol))
 })
 
+router.get('/logs', async (req, res) => {
+  return res.json(BotManager.Logs)
+})
+
 module.exports = router

@@ -26,15 +26,16 @@ const StopBot = async (data) => {
   return result.data
 }
 
-// const GetBot = async (data) => {
-//   let result = await axios.post(BaseUrl + '/bots/start', data)
-//   return result.data
-// }
+const GetLogs = async () => {
+  let result = await axios.get(BaseUrl + '/bots/logs')
+  return result.data
+}
 
 export default {
   GetExchangeInfo,
   GetIchimoku,
   StartBot,
   GetAllBots,
-  StopBot
+  StopBot,
+  GetLogs
 }
