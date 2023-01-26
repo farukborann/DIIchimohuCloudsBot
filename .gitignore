@@ -107,3 +107,5 @@ dist
 # Prettier extention settings
 .prettierrc
 .prettierignore
+
+.DS_Store
