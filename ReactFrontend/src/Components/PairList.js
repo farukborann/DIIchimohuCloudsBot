@@ -1,7 +1,7 @@
 import Api from '../Others/Api'
 import { useEffect, useState } from 'react'
 
-const Chart = ({ SetSelectedPair, className }) => {
+const Chart = ({ SelectedPair, SetSelectedPair, className }) => {
   const [Pairs, setPairs] = useState([])
 
   useEffect(() => {
@@ -19,6 +19,7 @@ const Chart = ({ SetSelectedPair, className }) => {
       name="Pairs"
       size="55"
       className={'p-2 ' + className}
+      value={SelectedPair}
       onChange={(e) => {
         SetSelectedPair(e.target.value)
       }}

@@ -1,12 +1,11 @@
 import Api from '../../Others/Api'
 import { useEffect, useState } from 'react'
 
-const BotsList = ({ Updater, SetUpdater, className }) => {
-  const [Bots, SetBots] = useState([])
-
+const BotsList = ({ Updater, SetUpdater, SetSelectedPair, SetSelectedInterval, Bots, SetBots, className }) => {
   const Update = async () => {
-    let Bots = await Api.GetAllBots()
-    SetBots(Bots)
+    let _Bots = await Api.GetAllBots()
+    SetBots(_Bots)
+    console.log(Bots)
   }
 
   useEffect(() => {
@@ -61,7 +60,8 @@ const BotsList = ({ Updater, SetUpdater, className }) => {
                     <button
                       className="border-2 border-gray-300"
                       onClick={async () => {
-                        //show logs
+                        SetSelectedPair(Bot.Symbol)
+                        SetSelectedInterval(Bot.Interval)
                       }}
                     >
                       Show

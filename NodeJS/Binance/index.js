@@ -70,7 +70,7 @@ module.exports.StartCalculateIchimoku = async (Symbol, Interval, ConversionLengt
 
   let ConnectionClose = BinanceClient.ws.futuresCandles(Symbol, Interval, (_kline) => {
     if (_kline.isFinal) {
-      if (Klines.at(-1).closeTime == _kline.closeTime) {
+      if (Klines.at(-1).closeTime === _kline.closeTime) {
         Klines.at(-1).high = parseFloat(_kline.high)
         Klines.at(-1).low = parseFloat(_kline.low)
         Klines.at(-1).close = parseFloat(_kline.close)

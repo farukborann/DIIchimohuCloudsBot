@@ -2,32 +2,55 @@ import Api from '../../Others/Api'
 import Order from './Order'
 import { useEffect, useState } from 'react'
 
-const BotManager = ({ SelectedPair, SelectedInterval, SetUpdater, className }) => {
+let LastSettingsDefault = false
+
+const T2BCrossDefault = {
+  OrderType: 'Limit',
+  Price: -1,
+  Size: 0,
+  Side: 'Short',
+  TPOrder: { IsActive: true, Price: 2, PercentMode: true, WorkingType: 'Mark' },
+  SLOrder: { IsActive: true, Price: 2, PercentMode: true, WorkingType: 'Mark' }
+}
+
+const B2TCrossDefault = {
+  OrderType: 'Limit',
+  Price: -1,
+  Size: 0,
+  Side: 'Long',
+  TPOrder: { IsActive: true, Price: 2, PercentMode: true, WorkingType: 'Mark' },
+  SLOrder: { IsActive: true, Price: 2, PercentMode: true, WorkingType: 'Mark' }
+}
+
+const BotManager = ({ SelectedPair, SelectedInterval, SetUpdater, Bots, className }) => {
   const [IndicatorValues, SetIndicatorValues] = useState({ CLL: 9, BLL: 26 })
-  const [T2BCross, SetT2BCross] = useState({
-    OrderType: 'Limit',
-    Price: -1,
-    Size: 0,
-    Side: 'Long',
-    TPOrder: { IsActive: false, Price: 2, PercentMode: true, WorkingType: 'Mark' },
-    SLOrder: { IsActive: false, Price: 2, PercentMode: true, WorkingType: 'Mark' }
-  })
-  const [B2TCross, SetB2TCross] = useState({
-    OrderType: 'Limit',
-    Price: -1,
-    Size: 0,
-    Side: 'Long',
-    TPOrder: { IsActive: false, Price: 2, PercentMode: true, WorkingType: 'Mark' },
-    SLOrder: { IsActive: false, Price: 2, PercentMode: true, WorkingType: 'Mark' }
-  })
+  const [T2BCross, SetT2BCross] = useState(T2BCrossDefault)
+  const [B2TCross, SetB2TCross] = useState(B2TCrossDefault)
 
   const Update = () => {
     if (!SelectedPair || !SelectedInterval) return
+
+    let Bot = Bots.find((Bot) => {
+      return Bot.Symbol === SelectedPair
+    })
+    if (!Bot) {
+      if (!LastSettingsDefault) {
+        SetT2BCross(T2BCrossDefault)
+        SetB2TCross(B2TCrossDefault)
+        LastSettingsDefault = true
+      }
+      return
+    }
+
+    SetIndicatorValues({ CLL: Bot.ConversionLength, BLL: Bot.BaseLength })
+    SetT2BCross(Bot.Cross1Order)
+    SetB2TCross(Bot.Cross2Order)
+    LastSettingsDefault = false
   }
 
   useEffect(() => {
     Update()
-  }, [SelectedPair, SelectedInterval])
+  }, [SelectedPair, SelectedInterval, Bots])
 
   return (
     <div className={'p-5 border-2 border-gray-300 ' + className}>

@@ -7,10 +7,15 @@ module.exports.Bots = Bots
 module.exports.Logs = Logs
 
 const CancelOrders = async (Bot) => {
-  if (!Bot.LastOrderIds) return
+  if (!Bot.LastOrders) return
 
-  await Binance.Client.futuresCancelOrder({ symbol: Bot.Symbol, orderId: Bot.LastOrderIds.MOrderId })
-  await Binance.Client.futuresCancelAllOpenOrders({ symbol: Bot.Symbol })
+  try {
+    let CancelOrder = { ...Bot.LastOrders.MainOrderSettings }
+    CancelOrder.side = CancelOrder.side === 'BUY' ? 'SELL' : 'BUY'
+    CancelOrder.reduceOnly = true
+    await Binance.Client.futuresOrder(CancelOrder)
+    await Binance.Client.futuresCancelAllOpenOrders({ symbol: Bot.Symbol })
+  } catch (ex) {}
 }
 
 function RoundStep(Quantity, StepSize) {
@@ -103,10 +108,18 @@ const CreateBotOrder = async (Order) => {
   if (Order.TPOrder.PercentMode) {
     if (Order.TPOrder.WorkingType === 'Mark') {
       await UpdateMarkPrice()
-      TPOrderSettings.stopPrice = MarkPrice * (1 + Order.TPOrder.Price / 100)
+      if (Order.Side === 'Long') {
+        TPOrderSettings.stopPrice = MarkPrice * (1 + Order.TPOrder.Price / 100)
+      } else {
+        TPOrderSettings.stopPrice = MarkPrice * (1 - Order.TPOrder.Price / 100)
+      }
     } else {
       await UpdateLastPrice()
-      TPOrderSettings.stopPrice = LastPrice * (1 + Order.TPOrder.Price / 100)
+      if (Order.Side === 'Long') {
+        TPOrderSettings.stopPrice = MarkPrice * (1 + Order.TPOrder.Price / 100)
+      } else {
+        TPOrderSettings.stopPrice = MarkPrice * (1 - Order.TPOrder.Price / 100)
+      }
     }
   } else {
     TPOrderSettings.stopPrice = Order.TPOrder.Price
@@ -117,10 +130,18 @@ const CreateBotOrder = async (Order) => {
   if (Order.SLOrder.PercentMode) {
     if (Order.SLOrder.WorkingType === 'Mark') {
       await UpdateMarkPrice()
-      SLOrderSettings.stopPrice = MarkPrice * (1 - Order.SLOrder.Price / 100)
+      if (Order.Side === 'Long') {
+        SLOrderSettings.stopPrice = MarkPrice * (1 - Order.SLOrder.Price / 100)
+      } else {
+        SLOrderSettings.stopPrice = MarkPrice * (1 + Order.SLOrder.Price / 100)
+      }
     } else {
       await UpdateLastPrice()
-      SLOrderSettings.stopPrice = LastPrice * (1 - Order.SLOrder.Price / 100)
+      if (Order.Side === 'Long') {
+        SLOrderSettings.stopPrice = MarkPrice * (1 - Order.SLOrder.Price / 100)
+      } else {
+        SLOrderSettings.stopPrice = MarkPrice * (1 + Order.SLOrder.Price / 100)
+      }
     }
   } else {
     SLOrderSettings.stopPrice = Order.SLOrder.Price
@@ -149,7 +170,9 @@ const CreateBotOrder = async (Order) => {
   }
 
   console.log(Order.Symbol, ' Orders Success')
-  return { TPOrderId, SLOrderId, MOrderId }
+  return {
+    MainOrderSettings
+  }
   // } catch (ex) {
   // }
 }
@@ -163,23 +186,24 @@ module.exports.StartBot = async ({ Symbol, Interval, ConversionLength, BaseLengt
   }
 
   let Calculation = await Binance.StartCalculateIchimoku(Symbol, Interval, ConversionLength, BaseLength, async (CrossType) => {
+    console.log('CROSSSSSSS')
     let Bot = Bots.find((Bot) => {
       return Bot.Symbol === Symbol
     })
 
     await CancelOrders(Bot)
     if (CrossType === 1) {
-      let LastOrderIds = CreateBotOrder({ ...Cross1Order, Symbol })
+      let LastOrders = await CreateBotOrder({ ...Cross1Order, Symbol })
 
-      Bot.LastOrderIds = LastOrderIds
+      Bot.LastOrders = LastOrders
 
       let Now = new Date()
       Bot.Logs.push({ Date: Now, Cross: 1 })
       Logs.push({ Symbol, Date: Now, Cross: 1 })
     } else if (CrossType === 2) {
-      let LastOrderIds = CreateBotOrder({ ...Cross1Order, Symbol })
+      let LastOrders = await CreateBotOrder({ ...Cross1Order, Symbol })
 
-      Bot.LastOrderIds = LastOrderIds
+      Bot.LastOrders = LastOrders
 
       let Now = new Date()
       Bot.Logs.push({ Date: Now, Cross: 2 })
