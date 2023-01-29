@@ -8,14 +8,19 @@ module.exports.Logs = Logs
 
 const CancelOrders = async (Bot) => {
   if (!Bot.LastOrders) return
-
-  try {
-    let CancelOrder = { ...Bot.LastOrders.MainOrderSettings }
-    CancelOrder.side = CancelOrder.side === 'BUY' ? 'SELL' : 'BUY'
-    CancelOrder.reduceOnly = true
-    await Binance.Client.futuresOrder(CancelOrder)
-    await Binance.Client.futuresCancelAllOpenOrders({ symbol: Bot.Symbol })
-  } catch (ex) {}
+  console.log('Orders Cancelling')
+  // try {
+  let CancelOrder = {
+    symbol: Bot.Symbol,
+    side: Bot.LastOrders.MainOrderSettings.side === 'BUY' ? 'SELL' : 'BUY',
+    reduceOnly: true,
+    type: 'MARKET',
+    positionSide: 'BOTH',
+    quantity: Bot.LastOrders.MainOrderSettings.quantity
+  }
+  await Binance.Client.futuresOrder(CancelOrder)
+  await Binance.Client.futuresCancelAllOpenOrders({ symbol: Bot.Symbol })
+  // } catch (ex) {}
 }
 
 function RoundStep(Quantity, StepSize) {
@@ -201,7 +206,7 @@ module.exports.StartBot = async ({ Symbol, Interval, ConversionLength, BaseLengt
       Bot.Logs.push({ Date: Now, Cross: 1 })
       Logs.push({ Symbol, Date: Now, Cross: 1 })
     } else if (CrossType === 2) {
-      let LastOrders = await CreateBotOrder({ ...Cross1Order, Symbol })
+      let LastOrders = await CreateBotOrder({ ...Cross2Order, Symbol })
 
       Bot.LastOrders = LastOrders
 

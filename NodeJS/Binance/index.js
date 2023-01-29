@@ -97,9 +97,14 @@ module.exports.StartCalculateIchimoku = async (Symbol, Interval, ConversionLengt
         kline.baseValue = baseValue
       }
 
-      let lastKline = Klines.at(-1)
-      let secondLastKline = Klines.at(-2)
-      let isCrossing = Helpers.DedectIndicatorCrossing(secondLastKline.conversionValue, lastKline.conversionValue, secondLastKline.baseValue, lastKline.baseValue)
+      let isCrossing = Helpers.DedectIndicatorCrossing(
+        Klines.map((Kline) => {
+          return Kline.conversionValue
+        }),
+        Klines.map((Kline) => {
+          return Kline.baseValue
+        })
+      )
       if (isCrossing === 1 || isCrossing === 2) {
         CrossCallback(isCrossing)
       }

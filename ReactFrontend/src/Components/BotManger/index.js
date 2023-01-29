@@ -60,6 +60,7 @@ const BotManager = ({ SelectedPair, SelectedInterval, SetUpdater, Bots, classNam
         <label className="mt-2">Conversion Line (Blue) Length</label>
         <input
           defaultValue={IndicatorValues.CLL}
+          value={IndicatorValues.CLL}
           className="mt-2 ml-2 border-2 border-gray-300"
           onChange={(e) => {
             SetIndicatorValues({ ...IndicatorValues, CLL: e.target.value })
@@ -69,6 +70,7 @@ const BotManager = ({ SelectedPair, SelectedInterval, SetUpdater, Bots, classNam
         <label className="mt-2">Base Line (Red) Length</label>
         <input
           defaultValue={IndicatorValues.BLL}
+          value={IndicatorValues.BLL}
           className="mt-2 ml-2 border-2 border-gray-300"
           onChange={(e) => {
             SetIndicatorValues({ ...IndicatorValues, BLL: e.target.value })
