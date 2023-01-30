@@ -18,7 +18,6 @@ module.exports.DedectIndicatorCrossing = (line1, line2) => {
   let i = line1.length - 2
   let j = line2.length - 2
   for (; !(i < 0 || j < 0); i--, j--) {
-    console.log('first')
     if (line1[i] !== line2[j]) {
       line1_1 = line1[i]
       line2_1 = line2[j]
@@ -26,7 +25,6 @@ module.exports.DedectIndicatorCrossing = (line1, line2) => {
     }
   }
 
-  console.log(line1_1, line2_1, line1_2, line2_2)
   if (!line1_1 || !line2_1 || !line1_2 || !line2_2) return 0
 
   if (line1_1 > line2_1 && line1_2 < line2_2) return 1

@@ -68,7 +68,9 @@ module.exports.StartCalculateIchimoku = async (Symbol, Interval, ConversionLengt
     Klines[i].baseValue = baseValue
   }
 
-  let ConnectionClose = BinanceClient.ws.futuresCandles(Symbol, Interval, (_kline) => {
+  let InCallback = false
+  let ConnectionClose = BinanceClient.ws.futuresCandles(Symbol, Interval, async (_kline) => {
+    if (InCallback) return
     if (_kline.isFinal) {
       if (Klines.at(-1).closeTime === _kline.closeTime) {
         Klines.at(-1).high = parseFloat(_kline.high)
@@ -106,7 +108,9 @@ module.exports.StartCalculateIchimoku = async (Symbol, Interval, ConversionLengt
         })
       )
       if (isCrossing === 1 || isCrossing === 2) {
-        CrossCallback(isCrossing)
+        InCallback = true
+        await CrossCallback(isCrossing)
+        InCallback = false
       }
     }
   })

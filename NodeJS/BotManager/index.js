@@ -6,21 +6,34 @@ let ExchangeInfo
 module.exports.Bots = Bots
 module.exports.Logs = Logs
 
-const CancelOrders = async (Bot) => {
-  if (!Bot.LastOrders) return
+const WaitForOrderCancelling = async (Symbol) => {
+  console.log('Waiting For Cancelling')
+  let SymbolOrder = await Binance.Client.futuresPositionRisk({ symbol: Symbol })[0]
+  await new Promise((resolve) =>
+    setTimeout(async () => {
+      if (SymbolOrder.entryPrice !== '0.0') {
+        await WaitForOrderCancelling(Symbol)
+      }
+      resolve()
+    }, 250)
+  )
+}
+
+const CancelOrders = async (Symbol) => {
   console.log('Orders Cancelling')
-  // try {
-  let CancelOrder = {
-    symbol: Bot.Symbol,
-    side: Bot.LastOrders.MainOrderSettings.side === 'BUY' ? 'SELL' : 'BUY',
-    reduceOnly: true,
-    type: 'MARKET',
-    positionSide: 'BOTH',
-    quantity: Bot.LastOrders.MainOrderSettings.quantity
+  let SymbolOrder = (await Binance.Client.futuresPositionRisk({ symbol: Symbol }))[0]
+  if (SymbolOrder.entryPrice !== '0.0') {
+    let CancelOrder = {
+      symbol: Symbol,
+      side: SymbolOrder.positionAmt.startsWith('-') ? 'BUY' : 'SELL',
+      reduceOnly: true,
+      type: 'MARKET',
+      positionSide: 'BOTH',
+      quantity: SymbolOrder.positionAmt.replace('-', '')
+    }
+    await Binance.Client.futuresOrder(CancelOrder)
+    await Binance.Client.futuresCancelAllOpenOrders({ symbol: Symbol })
   }
-  await Binance.Client.futuresOrder(CancelOrder)
-  await Binance.Client.futuresCancelAllOpenOrders({ symbol: Bot.Symbol })
-  // } catch (ex) {}
 }
 
 function RoundStep(Quantity, StepSize) {
@@ -33,7 +46,8 @@ function RoundStep(Quantity, StepSize) {
 }
 
 const CreateBotOrder = async (Order) => {
-  let MOrderId, SLOrderId, TPOrderId, Quantity, LastPrice, MarkPrice
+  let Quantity, LastPrice, MarkPrice
+
   let Filters = ExchangeInfo.find((Pair) => {
     return Pair.symbol === Order.Symbol
   }).filters
@@ -52,26 +66,6 @@ const CreateBotOrder = async (Order) => {
     positionSide: 'BOTH',
     type: Order.OrderType === 'Limit' ? 'LIMIT' : 'MARKET',
     reduceOnly: false
-  }
-
-  let SLOrderSettings = {
-    symbol: Order.Symbol,
-    side: Order.Side === 'Long' ? 'SELL' : 'BUY',
-    positionSide: 'BOTH',
-    type: 'STOP_MARKET',
-    timeInForce: 'GTE_GTC',
-    reduceOnly: true,
-    workingType: Order.SLOrder.WorkingType === 'Mark' ? 'MARK_PRICE' : 'CONTRACT_PRICE'
-  }
-
-  let TPOrderSettings = {
-    symbol: Order.Symbol,
-    side: Order.Side === 'Long' ? 'SELL' : 'BUY',
-    positionSide: 'BOTH',
-    type: 'TAKE_PROFIT_MARKET',
-    timeInForce: 'GTE_GTC',
-    reduceOnly: true,
-    workingType: Order.SLOrder.WorkingType === 'Mark' ? 'MARK_PRICE' : 'CONTRACT_PRICE'
   }
 
   // Limit Order
@@ -102,84 +96,109 @@ const CreateBotOrder = async (Order) => {
   }
 
   MainOrderSettings.quantity = Quantity
-  SLOrderSettings.quantity = Quantity
-  TPOrderSettings.quantity = Quantity
+  // NewOrders.push(MainOrderSettings)
 
-  // Check TP/SL Orders Percent Mode
+  let SLOrderSettings, TPOrderSettings
+
+  // For Check TP/SL Orders Percent Mode
   let TickSize = Filters.find((Filter) => {
     return Filter.filterType === 'PRICE_FILTER'
   }).tickSize
 
-  if (Order.TPOrder.PercentMode) {
-    if (Order.TPOrder.WorkingType === 'Mark') {
-      await UpdateMarkPrice()
-      if (Order.Side === 'Long') {
-        TPOrderSettings.stopPrice = MarkPrice * (1 + Order.TPOrder.Price / 100)
-      } else {
-        TPOrderSettings.stopPrice = MarkPrice * (1 - Order.TPOrder.Price / 100)
-      }
-    } else {
-      await UpdateLastPrice()
-      if (Order.Side === 'Long') {
-        TPOrderSettings.stopPrice = MarkPrice * (1 + Order.TPOrder.Price / 100)
-      } else {
-        TPOrderSettings.stopPrice = MarkPrice * (1 - Order.TPOrder.Price / 100)
-      }
-    }
-  } else {
-    TPOrderSettings.stopPrice = Order.TPOrder.Price
-  }
-
-  TPOrderSettings.stopPrice = RoundStep(TPOrderSettings.stopPrice, TickSize)
-
-  if (Order.SLOrder.PercentMode) {
-    if (Order.SLOrder.WorkingType === 'Mark') {
-      await UpdateMarkPrice()
-      if (Order.Side === 'Long') {
-        SLOrderSettings.stopPrice = MarkPrice * (1 - Order.SLOrder.Price / 100)
-      } else {
-        SLOrderSettings.stopPrice = MarkPrice * (1 + Order.SLOrder.Price / 100)
-      }
-    } else {
-      await UpdateLastPrice()
-      if (Order.Side === 'Long') {
-        SLOrderSettings.stopPrice = MarkPrice * (1 - Order.SLOrder.Price / 100)
-      } else {
-        SLOrderSettings.stopPrice = MarkPrice * (1 + Order.SLOrder.Price / 100)
-      }
-    }
-  } else {
-    SLOrderSettings.stopPrice = Order.SLOrder.Price
-  }
-  SLOrderSettings.stopPrice = RoundStep(SLOrderSettings.stopPrice, TickSize)
-
-  console.log(MainOrderSettings)
-  console.log(SLOrderSettings)
-  console.log(TPOrderSettings)
-
-  // try {
-  let MOrder = await Binance.Client.futuresOrder(MainOrderSettings)
-  if (MOrder.orderId) MOrderId = MOrder.orderId
-  else return { error: 'Main order error!' }
-
   if (Order.SLOrder.IsActive) {
-    let SLOrder = await Binance.Client.futuresOrder(SLOrderSettings)
-    if (SLOrder.orderId) SLOrderId = SLOrder.orderId
-    else return { error: 'Stop loss order error! Please close take profit order manual.' }
+    SLOrderSettings = {
+      symbol: Order.Symbol,
+      side: Order.Side === 'Long' ? 'SELL' : 'BUY',
+      positionSide: 'BOTH',
+      type: 'STOP_MARKET',
+      timeInForce: 'GTE_GTC',
+      reduceOnly: true,
+      quantity: Quantity,
+      workingType: Order.SLOrder.WorkingType === 'Mark' ? 'MARK_PRICE' : 'CONTRACT_PRICE'
+    }
+
+    if (Order.SLOrder.PercentMode) {
+      if (Order.SLOrder.WorkingType === 'Mark') {
+        await UpdateMarkPrice()
+        if (Order.Side === 'Long') {
+          SLOrderSettings.stopPrice = MarkPrice * (1 - Order.SLOrder.Price / 100)
+        } else {
+          SLOrderSettings.stopPrice = MarkPrice * (1 + Order.SLOrder.Price / 100)
+        }
+      } else {
+        await UpdateLastPrice()
+        if (Order.Side === 'Long') {
+          SLOrderSettings.stopPrice = MarkPrice * (1 - Order.SLOrder.Price / 100)
+        } else {
+          SLOrderSettings.stopPrice = MarkPrice * (1 + Order.SLOrder.Price / 100)
+        }
+      }
+    } else {
+      SLOrderSettings.stopPrice = Order.SLOrder.Price
+    }
+    SLOrderSettings.stopPrice = RoundStep(SLOrderSettings.stopPrice, TickSize)
   }
 
   if (Order.TPOrder.IsActive) {
-    let TPOrder = await Binance.Client.futuresOrder(TPOrderSettings)
-    if (TPOrder.orderId) TPOrderId = TPOrder.orderId
-    else return { error: 'Take profit order error!' }
+    TPOrderSettings = {
+      symbol: Order.Symbol,
+      side: Order.Side === 'Long' ? 'SELL' : 'BUY',
+      positionSide: 'BOTH',
+      type: 'TAKE_PROFIT_MARKET',
+      timeInForce: 'GTE_GTC',
+      reduceOnly: true,
+      quantity: Quantity,
+      workingType: Order.SLOrder.WorkingType === 'Mark' ? 'MARK_PRICE' : 'CONTRACT_PRICE'
+    }
+
+    if (Order.TPOrder.PercentMode) {
+      if (Order.TPOrder.WorkingType === 'Mark') {
+        await UpdateMarkPrice()
+        if (Order.Side === 'Long') {
+          TPOrderSettings.stopPrice = MarkPrice * (1 + Order.TPOrder.Price / 100)
+        } else {
+          TPOrderSettings.stopPrice = MarkPrice * (1 - Order.TPOrder.Price / 100)
+        }
+      } else {
+        await UpdateLastPrice()
+        if (Order.Side === 'Long') {
+          TPOrderSettings.stopPrice = MarkPrice * (1 + Order.TPOrder.Price / 100)
+        } else {
+          TPOrderSettings.stopPrice = MarkPrice * (1 - Order.TPOrder.Price / 100)
+        }
+      }
+    } else {
+      TPOrderSettings.stopPrice = Order.TPOrder.Price
+    }
+
+    TPOrderSettings.stopPrice = RoundStep(TPOrderSettings.stopPrice, TickSize)
+  }
+
+  // let LastOrders = await Binance.Client.futuresBatchOrders({ batchOrders: NewOrders })
+
+  let Orders = {}
+  Orders.MOrder = await Binance.Client.futuresOrder(MainOrderSettings)
+  // if (MOrder.orderId) MOrderId = MOrder.orderId
+  // else return { error: 'Main order error!' }
+
+  if (Order.SLOrder.IsActive) {
+    Orders.SLOrder = await Binance.Client.futuresOrder(SLOrderSettings)
+    // if (SLOrder.orderId) SLOrderId = SLOrder.orderId
+    // else return { error: 'Stop loss order error! Please close take profit order manual.' }
+  }
+
+  if (Order.TPOrder.IsActive) {
+    Orders.TPOrder = await Binance.Client.futuresOrder(TPOrderSettings)
+    // if (TPOrder.orderId) TPOrderId = TPOrder.orderId
+    // else return { error: 'Take profit order error!' }
   }
 
   console.log(Order.Symbol, ' Orders Success')
   return {
-    MainOrderSettings
+    Quantity: MainOrderSettings.quantity,
+    Side: MainOrderSettings.side,
+    LastOrderds: Orders
   }
-  // } catch (ex) {
-  // }
 }
 
 // Cross1Order => Blue cross red
@@ -189,14 +208,16 @@ module.exports.StartBot = async ({ Symbol, Interval, ConversionLength, BaseLengt
   if (Bots.some((bot) => bot.Symbol === Symbol)) {
     return { error: 'Symbol has bot' }
   }
+  await CreateBotOrder({ ...Cross1Order, Symbol })
 
   let Calculation = await Binance.StartCalculateIchimoku(Symbol, Interval, ConversionLength, BaseLength, async (CrossType) => {
-    console.log('CROSSSSSSS')
     let Bot = Bots.find((Bot) => {
       return Bot.Symbol === Symbol
     })
 
-    await CancelOrders(Bot)
+    await CancelOrders(Symbol)
+    // Wait for filling cancel order
+    await new Promise((resolve) => setTimeout(resolve, 200))
     if (CrossType === 1) {
       let LastOrders = await CreateBotOrder({ ...Cross1Order, Symbol })
 
