@@ -55,6 +55,13 @@ module.exports.GetExchangeInfo = async () => {
   return ExchangeInfo
 }
 
+module.exports.GetSymbolSettings = async (Symbol) => {
+  let SymbolSettings = (await Binance.Client.futuresPositionRisk({ symbol: Symbol }))[0]
+  let MaxLeverage = (await Binance.Client.futuresLeverageBracket({ symbol: Symbol }))[0].brackets[0].initialLeverage
+
+  return { MarginType: SymbolSettings.marginType, CurrentLeverage: SymbolSettings.leverage, MaxLeverage }
+}
+
 module.exports.StartCalculateIchimoku = async (Symbol, Interval, ConversionLength, BaseLength, CrossCallback) => {
   let klineCount = Math.max(ConversionLength, BaseLength)
   let Klines = (await BinanceClient.futuresCandles({ symbol: Symbol, interval: Interval, limit: klineCount * 2 })).map((_kline) => {

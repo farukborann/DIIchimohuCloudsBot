@@ -208,7 +208,6 @@ module.exports.StartBot = async ({ Symbol, Interval, ConversionLength, BaseLengt
   if (Bots.some((bot) => bot.Symbol === Symbol)) {
     return { error: 'Symbol has bot' }
   }
-  await CreateBotOrder({ ...Cross1Order, Symbol })
 
   let Calculation = await Binance.StartCalculateIchimoku(Symbol, Interval, ConversionLength, BaseLength, async (CrossType) => {
     let Bot = Bots.find((Bot) => {

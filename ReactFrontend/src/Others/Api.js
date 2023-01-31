@@ -21,6 +21,11 @@ const GetAllBots = async () => {
   return result.data
 }
 
+const GetSymbolSettings = async () => {
+  let result = await axios.get(BaseUrl + '/binance/symbol_settings')
+  return result.data
+}
+
 const StopBot = async (data) => {
   let result = await axios.post(BaseUrl + '/bots/stop', data)
   return result.data
@@ -37,5 +42,6 @@ export default {
   StartBot,
   GetAllBots,
   StopBot,
-  GetLogs
+  GetLogs,
+  GetSymbolSettings
 }

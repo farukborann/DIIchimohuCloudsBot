@@ -8,4 +8,9 @@ router.get('/exchange_info', async (req, res) => {
   return res.json(ExchangeInfo)
 })
 
+router.get('/symbol_settings', async (req, res) => {
+  let Settings = await Binance.GetSymbolSettings(req.body.Symbol)
+  return res.json(Settings)
+})
+
 module.exports = router
