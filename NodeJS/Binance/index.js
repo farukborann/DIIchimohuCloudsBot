@@ -56,10 +56,24 @@ module.exports.GetExchangeInfo = async () => {
 }
 
 module.exports.GetSymbolSettings = async (Symbol) => {
-  let SymbolSettings = (await Binance.Client.futuresPositionRisk({ symbol: Symbol }))[0]
-  let MaxLeverage = (await Binance.Client.futuresLeverageBracket({ symbol: Symbol }))[0].brackets[0].initialLeverage
+  let SymbolSettings = (await BinanceClient.futuresPositionRisk({ symbol: Symbol }))[0]
+  let MaxLeverage = (await BinanceClient.futuresLeverageBracket({ symbol: Symbol }))[0].brackets[0].initialLeverage
 
-  return { MarginType: SymbolSettings.marginType, CurrentLeverage: SymbolSettings.leverage, MaxLeverage }
+  let MarginMode = SymbolSettings.marginType === 'cross' ? 'Cross' : 'Isolated'
+  return { MarginMode, CurrentLeverage: parseInt(SymbolSettings.leverage), MaxLeverage }
+}
+
+module.exports.SetSymbolSettings = async (Symbol, Leverage, MarginMode) => {
+  let SymbolSettings = await this.GetSymbolSettings(Symbol)
+
+  if (SymbolSettings.CurrentLeverage !== Leverage) {
+    await BinanceClient.futuresLeverage({ symbol: Symbol, leverage: Leverage })
+  }
+  if (!(MarginMode === 'Cross' && SymbolSettings.MarginMode === 'Cross') && !(MarginMode === 'Isolated' && SymbolSettings.MarginMode === 'Isolated')) {
+    await BinanceClient.futuresMarginType({ symbol: Symbol, marginType: MarginMode === 'Cross' ? 'CROSSED' : 'ISOLATED' })
+  }
+
+  return { result: true }
 }
 
 module.exports.StartCalculateIchimoku = async (Symbol, Interval, ConversionLength, BaseLength, CrossCallback) => {

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import CandlestickChart from '../Components/CandlestickChart'
-import UpdateChartButton from '../Components/CandlestickChart/UpdateChartButton'
+import UpdateChartButton from '../Components/CandlestickChart/UpdateButton'
 import PairList from '../Components/PairList'
 import IntervalList from '../Components/IntervalList'
 import BotManger from '../Components/BotManger'
@@ -25,6 +25,10 @@ const Page = () => {
     AutoUpdate()
   }, [])
 
+  useEffect(() => {
+    SetAutoUpdater(true)
+  }, [ManuelUpdater])
+
   return (
     <>
       <div className="float-left m-5">
@@ -43,7 +47,7 @@ const Page = () => {
             <div className="float-left">
               <IntervalList className="border-2 border-gray-300 h-fit outline-none" SelectedInterval={SelectedInterval} SetSelectedInterval={SetSelectedInterval} />
               <br></br>
-              <UpdateChartButton SetUpdater={SetAutoUpdater} />
+              <UpdateChartButton SetUpdater={SetManuelUpdater} />
             </div>
             <BotsList
               Updater={AutoUpdater}

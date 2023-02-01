@@ -8,8 +8,13 @@ router.get('/exchange_info', async (req, res) => {
   return res.json(ExchangeInfo)
 })
 
-router.get('/symbol_settings', async (req, res) => {
+router.post('/get_symbol_settings', async (req, res) => {
   let Settings = await Binance.GetSymbolSettings(req.body.Symbol)
+  return res.json(Settings)
+})
+
+router.post('/set_symbol_settings', async (req, res) => {
+  let Settings = await Binance.SetSymbolSettings(req.body.Symbol, req.body.Leverage, req.body.MarginMode)
   return res.json(Settings)
 })
 

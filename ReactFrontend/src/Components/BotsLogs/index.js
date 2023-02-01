@@ -20,8 +20,8 @@ const BotsLogs = ({ Updater, SetUpdater, className }) => {
 
   return (
     <div className={'p-5 border-2 border-gray-300 ' + className}>
-      <caption>Logs</caption>
       <table className="whitespace-nowrap w-full">
+        <caption>Logs</caption>
         <thead>
           <tr>
             <th>Symbol</th>
