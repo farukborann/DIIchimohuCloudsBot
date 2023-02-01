@@ -2,7 +2,7 @@ import Api from '../../Others/Api'
 import { useEffect, useState } from 'react'
 import { format } from 'date-fns'
 
-const BotsLogs = ({ Updater, SetUpdater, className }) => {
+const BotsLogs = ({ Updater, className }) => {
   const [Logs, SetLogs] = useState([])
 
   const Update = async () => {

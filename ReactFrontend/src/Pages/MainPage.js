@@ -60,10 +60,10 @@ const Page = () => {
             />
           </div>
           <br></br>
-          <div className="float-left">
+          <div className="float-left h-auto">
             <BotManger className="float-left w-[810px] h-fit" SelectedPair={SelectedPair} SelectedInterval={SelectedInterval} SetUpdater={SetAutoUpdater} Bots={Bots} />
-            <div className="float-left w-[810px] h-fit">
-              <BotsLogs className="float-left w-[810px] h-[515px] flex flex-col" Updater={AutoUpdater} SetUpdater={SetAutoUpdater} />
+            <div className="float-left w-[810px] h-auto">
+              <BotsLogs className="float-left w-[810px] h-[545px] flex flex-col" Updater={AutoUpdater} />
             </div>
           </div>
           <br></br>
