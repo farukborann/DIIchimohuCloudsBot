@@ -5,7 +5,6 @@ const BotsList = ({ Updater, SetUpdater, SetSelectedPair, SetSelectedInterval, B
   const Update = async () => {
     let _Bots = await Api.GetAllBots()
     SetBots(_Bots)
-    console.log(Bots)
   }
 
   useEffect(() => {

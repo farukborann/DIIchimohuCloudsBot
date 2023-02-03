@@ -2,7 +2,7 @@ import Api from '../../Others/Api'
 import { useEffect, useState } from 'react'
 import { format } from 'date-fns'
 
-const BotsLogs = ({ Updater, className }) => {
+const BotsLogs = ({ Updater, onLoad, className }) => {
   const [Logs, SetLogs] = useState([])
 
   const Update = async () => {
@@ -19,7 +19,7 @@ const BotsLogs = ({ Updater, className }) => {
   }, [])
 
   return (
-    <div className={'p-5 border-2 border-gray-300 ' + className}>
+    <div className={'p-5 border-2 border-gray-300 ' + className} onLoad={onLoad}>
       <table className="whitespace-nowrap w-full">
         <caption>Logs</caption>
         <thead>

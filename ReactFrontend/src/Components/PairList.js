@@ -1,19 +1,7 @@
 import Api from '../Others/Api'
 import { useEffect, useState } from 'react'
 
-const Chart = ({ SelectedPair, SetSelectedPair, className }) => {
-  const [Pairs, setPairs] = useState([])
-
-  useEffect(() => {
-    Api.GetExchangeInfo().then((exchangeInfo) => {
-      setPairs(
-        exchangeInfo.symbols.map((Pair) => {
-          return { Symbol: Pair.symbol }
-        })
-      )
-    })
-  }, [])
-
+const Chart = ({ SelectedPair, SetSelectedPair, ExchangeInfo, className }) => {
   return (
     <select
       name="Pairs"
@@ -24,7 +12,7 @@ const Chart = ({ SelectedPair, SetSelectedPair, className }) => {
         SetSelectedPair(e.target.value)
       }}
     >
-      {Pairs.map((Pair) => {
+      {ExchangeInfo.map((Pair) => {
         return (
           <option value={Pair.Symbol} key={Pair.Symbol}>
             {Pair.Symbol}

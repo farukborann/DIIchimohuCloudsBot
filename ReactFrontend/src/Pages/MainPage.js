@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react'
+import Api from '../Others/Api'
+import React, { useState, useEffect } from 'react'
 import CandlestickChart from '../Components/CandlestickChart'
 import UpdateChartButton from '../Components/CandlestickChart/UpdateButton'
 import PairList from '../Components/PairList'
@@ -9,6 +10,7 @@ import BotsLogs from '../Components/BotsLogs'
 import SymbolSettings from '../Components/SymbolSettings'
 
 const Page = () => {
+  const [ExchangeInfo, SetExchangeInfo] = useState([])
   const [SelectedPair, SetSelectedPair] = useState('BTCUSDT')
   const [SelectedInterval, SetSelectedInterval] = useState('1m')
   const [Bots, SetBots] = useState([])
@@ -23,6 +25,9 @@ const Page = () => {
   }
   useEffect(() => {
     AutoUpdate()
+    Api.GetExchangeInfo().then((ExchangeInfo) => {
+      SetExchangeInfo(ExchangeInfo.symbols.map((Symbol) => Symbol))
+    })
   }, [])
 
   useEffect(() => {
