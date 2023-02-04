@@ -20,20 +20,15 @@ module.exports.Intervals = {
   oneMonth: '1M'
 }
 
-let BinanceClient
+// let BinanceClient
 
-module.exports.Main = async ({ apiKey, apiSecret, testMode }) => {
+module.exports.Main = async ({ apiKey, apiSecret }) => {
   const Settings = { apiKey, apiSecret }
 
-  if (testMode) {
-    Settings.httpBase = 'https://testnet.binance.vision'
-    Settings.httpFutures = 'https://testnet.binancefuture.com'
-  }
+  // BinanceClient = Binance.default(Settings)
+  module.exports.Client = Binance.default(Settings)
 
-  BinanceClient = Binance.default(Settings)
-  module.exports.Client = BinanceClient
-
-  let TestConnection = await BinanceClient.futuresPing()
+  let TestConnection = await module.exports.Client.futuresPing()
   if (TestConnection === true) {
     console.log('Binance Connetion Successful.')
     return
@@ -43,7 +38,7 @@ module.exports.Main = async ({ apiKey, apiSecret, testMode }) => {
 }
 
 module.exports.GetKlines = async (Symbol, Interval, Limit) => {
-  let Klines = await BinanceClient.futuresCandles({ symbol: Symbol, interval: Interval, limit: Limit })
+  let Klines = await module.exports.Client.futuresCandles({ symbol: Symbol, interval: Interval, limit: Limit })
   Klines = Klines.map((Kline) => {
     return Kline
   })
@@ -51,26 +46,35 @@ module.exports.GetKlines = async (Symbol, Interval, Limit) => {
 }
 
 module.exports.GetExchangeInfo = async () => {
-  let ExchangeInfo = await BinanceClient.futuresExchangeInfo()
+  let ExchangeInfo = await module.exports.Client.futuresExchangeInfo()
   return ExchangeInfo
 }
 
 module.exports.GetSymbolSettings = async (Symbol) => {
-  let SymbolSettings = (await BinanceClient.futuresPositionRisk({ symbol: Symbol }))[0]
-  let MaxLeverage = (await BinanceClient.futuresLeverageBracket({ symbol: Symbol }))[0].brackets[0].initialLeverage
+  try {
+    let SymbolSettings = (await module.exports.Client.futuresPositionRisk({ symbol: Symbol }))[0]
+    let MaxLeverage = (await module.exports.Client.futuresLeverageBracket({ symbol: Symbol }))[0].brackets[0].initialLeverage
 
-  let MarginMode = SymbolSettings.marginType === 'cross' ? 'Cross' : 'Isolated'
-  return { MarginMode, CurrentLeverage: parseInt(SymbolSettings.leverage), MaxLeverage }
+    let MarginMode = SymbolSettings.marginType === 'cross' ? 'Cross' : 'Isolated'
+    return { MarginMode, CurrentLeverage: parseInt(SymbolSettings.leverage), MaxLeverage }
+  } catch {
+    return { MarginMode: 'Cross', CurrentLeverage: -1, MaxLeverage: -1 }
+  }
+}
+
+module.exports.GetSymbolPrice = async (Symbol) => {
+  let Price = await module.exports.Client.futuresPrices({ symbol: Symbol })
+  return { Price: parseFloat(Price[Symbol]) }
 }
 
 module.exports.SetSymbolSettings = async (Symbol, Leverage, MarginMode) => {
   let SymbolSettings = await this.GetSymbolSettings(Symbol)
 
   if (SymbolSettings.CurrentLeverage !== Leverage) {
-    await BinanceClient.futuresLeverage({ symbol: Symbol, leverage: Leverage })
+    await module.exports.Client.futuresLeverage({ symbol: Symbol, leverage: Leverage })
   }
   if (!(MarginMode === 'Cross' && SymbolSettings.MarginMode === 'Cross') && !(MarginMode === 'Isolated' && SymbolSettings.MarginMode === 'Isolated')) {
-    await BinanceClient.futuresMarginType({ symbol: Symbol, marginType: MarginMode === 'Cross' ? 'CROSSED' : 'ISOLATED' })
+    await module.exports.Client.futuresMarginType({ symbol: Symbol, marginType: MarginMode === 'Cross' ? 'CROSSED' : 'ISOLATED' })
   }
 
   return { result: true }
@@ -78,19 +82,21 @@ module.exports.SetSymbolSettings = async (Symbol, Leverage, MarginMode) => {
 
 module.exports.StartCalculateIchimoku = async (Symbol, Interval, ConversionLength, BaseLength, CrossCallback) => {
   let klineCount = Math.max(ConversionLength, BaseLength)
-  let Klines = (await BinanceClient.futuresCandles({ symbol: Symbol, interval: Interval, limit: klineCount * 2 })).map((_kline) => {
+  let Klines = (await module.exports.Client.futuresCandles({ symbol: Symbol, interval: Interval, limit: klineCount * 2 })).map((_kline) => {
     let kline = { openTime: _kline.openTime, closeTime: _kline.closeTime, open: parseFloat(_kline.open), high: parseFloat(_kline.high), low: parseFloat(_kline.low), close: parseFloat(_kline.close) }
     return kline
   })
 
+  let priceStepSize = (await this.GetExchangeInfo()).symbols.find((pair) => pair.symbol === Symbol).filters.find((filter) => filter.filterType === 'PRICE_FILTER').tickSize
+
   for (let i = klineCount; i < Klines.length; i++) {
-    let { conversionValue, baseValue } = Ichimoku.Calculate(Klines.slice(i - klineCount, i), ConversionLength, BaseLength)
+    let { conversionValue, baseValue } = Ichimoku.Calculate(Klines.slice(i - klineCount, i), ConversionLength, BaseLength, priceStepSize)
     Klines[i].conversionValue = conversionValue
     Klines[i].baseValue = baseValue
   }
 
   let InCallback = false
-  let ConnectionClose = BinanceClient.ws.futuresCandles(Symbol, Interval, async (_kline) => {
+  let ConnectionClose = module.exports.Client.ws.futuresCandles(Symbol, Interval, async (_kline) => {
     if (InCallback) return
     if (_kline.isFinal) {
       if (Klines.at(-1).closeTime === _kline.closeTime) {
@@ -99,7 +105,7 @@ module.exports.StartCalculateIchimoku = async (Symbol, Interval, ConversionLengt
         Klines.at(-1).close = parseFloat(_kline.close)
         Klines.at(-1).open = parseFloat(_kline.open)
 
-        let { conversionValue, baseValue } = Ichimoku.Calculate(Klines.slice(Klines.length - klineCount, Klines.length), ConversionLength, BaseLength)
+        let { conversionValue, baseValue } = Ichimoku.Calculate(Klines.slice(Klines.length - klineCount, Klines.length), ConversionLength, BaseLength, priceStepSize)
         Klines.at(-1).conversionValue = conversionValue
         Klines.at(-1).baseValue = baseValue
       } else {
@@ -115,7 +121,7 @@ module.exports.StartCalculateIchimoku = async (Symbol, Interval, ConversionLengt
         Klines.push(kline)
         Klines.splice(0, 1)
 
-        let { conversionValue, baseValue } = Ichimoku.Calculate(Klines.slice(Klines.length - klineCount, Klines.length), ConversionLength, BaseLength)
+        let { conversionValue, baseValue } = Ichimoku.Calculate(Klines.slice(Klines.length - klineCount, Klines.length), ConversionLength, BaseLength, priceStepSize)
         kline.conversionValue = conversionValue
         kline.baseValue = baseValue
       }

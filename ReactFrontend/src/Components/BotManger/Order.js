@@ -1,3 +1,5 @@
+import React from 'react'
+
 const Order = ({ Values, SetValues, className }) => {
   return (
     <div className={className}>
@@ -40,6 +42,7 @@ const Order = ({ Values, SetValues, className }) => {
       <input // Size Input
         type="number"
         value={Values.Size}
+        min={Values.MinSize}
         className="ml-2 border-2 border-gray-300"
         onChange={(e) => {
           SetValues({ ...Values, Size: e.target.value })

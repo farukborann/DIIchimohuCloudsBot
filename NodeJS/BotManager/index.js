@@ -1,23 +1,12 @@
 const Binance = require('../Binance/')
+const Database = require('../Database')
+const { RoundStep } = require('../Binance/Helpers')
 
 let Bots = []
 let Logs = []
 let ExchangeInfo
 module.exports.Bots = Bots
 module.exports.Logs = Logs
-
-const WaitForOrderCancelling = async (Symbol) => {
-  console.log('Waiting For Cancelling')
-  let SymbolOrder = await Binance.Client.futuresPositionRisk({ symbol: Symbol })[0]
-  await new Promise((resolve) =>
-    setTimeout(async () => {
-      if (SymbolOrder.entryPrice !== '0.0') {
-        await WaitForOrderCancelling(Symbol)
-      }
-      resolve()
-    }, 250)
-  )
-}
 
 const CancelOrders = async (Symbol) => {
   console.log('Orders Cancelling')
@@ -34,15 +23,6 @@ const CancelOrders = async (Symbol) => {
     await Binance.Client.futuresOrder(CancelOrder)
     await Binance.Client.futuresCancelAllOpenOrders({ symbol: Symbol })
   }
-}
-
-function RoundStep(Quantity, StepSize) {
-  // Integers do not require rounding
-  if (Number.isInteger(Quantity)) return Quantity
-  const qtyString = parseFloat(Quantity).toFixed(16)
-  const desiredDecimals = Math.max(StepSize.indexOf('1') - 1, 0)
-  const decimalIndex = qtyString.indexOf('.')
-  return parseFloat(qtyString.slice(0, decimalIndex + desiredDecimals + 1))
 }
 
 const CreateBotOrder = async (Order) => {
@@ -220,6 +200,7 @@ module.exports.StartBot = async ({ Symbol, Interval, ConversionLength, BaseLengt
     if (CrossType === 1) {
       let LastOrders = await CreateBotOrder({ ...Cross1Order, Symbol })
 
+      await Database.AddOrder(Symbol, LastOrders.LastOrderds.MOrder.orderId)
       Bot.LastOrders = LastOrders
 
       let Now = new Date()
@@ -228,6 +209,7 @@ module.exports.StartBot = async ({ Symbol, Interval, ConversionLength, BaseLengt
     } else if (CrossType === 2) {
       let LastOrders = await CreateBotOrder({ ...Cross2Order, Symbol })
 
+      await Database.AddOrder(Symbol, LastOrders.LastOrderds.MOrder.orderId)
       Bot.LastOrders = LastOrders
 
       let Now = new Date()
@@ -253,4 +235,14 @@ module.exports.StopBot = (Symbol) => {
   Bots.splice(BotIndex, 1)
   console.log('Bot stopped => ' + Bot.Symbol + ' ' + Bot.Interval)
   return { result: true }
+}
+
+module.exports.Main = async () => {
+  await Binance.Client.ws.futuresUser((event) => {
+    if (event.eventType === 'ORDER_TRADE_UPDATE' && event.orderStatus === 'FILLED' && event.isReduceOnly === true) {
+      Database.EndOrder(event.orderId, parseFloat(event.realizedProfit))
+    }
+  })
+  // console.log(await Database.GetGeneralStatistics('ADAUSDT'))
+  // console.log(await Database.GetLast20Order('ADAUSDT'))
 }

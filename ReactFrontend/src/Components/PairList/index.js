@@ -1,5 +1,4 @@
-import Api from '../Others/Api'
-import { useEffect, useState } from 'react'
+import React from 'react'
 
 const Chart = ({ SelectedPair, SetSelectedPair, ExchangeInfo, className }) => {
   return (
@@ -14,8 +13,8 @@ const Chart = ({ SelectedPair, SetSelectedPair, ExchangeInfo, className }) => {
     >
       {ExchangeInfo.map((Pair) => {
         return (
-          <option value={Pair.Symbol} key={Pair.Symbol}>
-            {Pair.Symbol}
+          <option value={Pair.symbol} key={Pair.symbol}>
+            {Pair.symbol}
           </option>
         )
       })}

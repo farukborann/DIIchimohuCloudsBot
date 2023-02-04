@@ -1,4 +1,6 @@
-module.exports.Calculate = (klines, conversionLength, baseLength) => {
+const { RoundStep } = require('./Helpers')
+
+module.exports.Calculate = (klines, conversionLength, baseLength, stepSize) => {
   if (klines.length < Math.max(conversionLength, baseLength)) {
     return { error: { message: 'Klines length error' } }
   }
@@ -12,7 +14,7 @@ module.exports.Calculate = (klines, conversionLength, baseLength) => {
   let conversionValue = (conversionResults.high + conversionResults.low) / 2
   let baseValue = (baseResults.high + baseResults.low) / 2
 
-  return { conversionValue: parseFloat(conversionValue.toFixed(2)), baseValue: parseFloat(baseValue.toFixed(2)) }
+  return { conversionValue: RoundStep(conversionValue, stepSize), baseValue: RoundStep(baseValue, stepSize) }
 }
 
 const GetHighLow = (klines) => {

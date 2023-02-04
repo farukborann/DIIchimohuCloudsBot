@@ -18,4 +18,9 @@ router.post('/set_symbol_settings', async (req, res) => {
   return res.json(Settings)
 })
 
+router.post('/get_symbol_price', async (req, res) => {
+  let SymbolPrice = await Binance.GetSymbolPrice(req.body.Symbol)
+  return res.json(SymbolPrice)
+})
+
 module.exports = router

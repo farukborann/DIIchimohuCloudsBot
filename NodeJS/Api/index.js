@@ -3,6 +3,7 @@ const Morgan = require('morgan') // Terminal logging
 const ChartsRouter = require('./Routes/Charts')
 const BinanceRouter = require('./Routes/Binance')
 const BotsRouter = require('./Routes/Bots')
+const DatabaseRouter = require('./Routes/Database')
 
 let App
 
@@ -23,6 +24,7 @@ module.exports.Main = () => {
   App.use('/charts', ChartsRouter)
   App.use('/binance', BinanceRouter)
   App.use('/bots', BotsRouter)
+  App.use('/database', DatabaseRouter)
 
   //Listen for requests
   App.listen(process.env.Port)

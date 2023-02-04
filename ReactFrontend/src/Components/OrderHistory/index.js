@@ -1,5 +1,5 @@
 import Api from '../../Others/Api'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 
 const BotsList = ({ Updater, SetUpdater, SetSelectedPair, SetSelectedInterval, Bots, SetBots, className }) => {
   const Update = async () => {

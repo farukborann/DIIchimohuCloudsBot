@@ -41,6 +41,21 @@ const GetLogs = async () => {
   return result.data
 }
 
+const GetSymbolPrice = async (data) => {
+  let result = await axios.post(BaseUrl + '/binance/get_symbol_price', data)
+  return result.data
+}
+
+const GetGeneralStatistics = async (data) => {
+  let result = await axios.post(BaseUrl + '/database/get_general_statistics', data)
+  return result.data
+}
+
+const GetLast20Order = async (data) => {
+  let result = await axios.post(BaseUrl + '/database/get_last_orders', data)
+  return result.data
+}
+
 export default {
   GetExchangeInfo,
   GetIchimoku,
@@ -49,5 +64,8 @@ export default {
   StopBot,
   GetLogs,
   GetSymbolSettings,
-  SetSymbolSettings
+  SetSymbolSettings,
+  GetSymbolPrice,
+  GetGeneralStatistics,
+  GetLast20Order
 }
