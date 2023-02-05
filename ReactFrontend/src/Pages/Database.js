@@ -2,6 +2,7 @@ import Api from '../Others/Api'
 import React, { useState, useEffect } from 'react'
 import PairList from '../Components/PairList'
 import GeneralStatistics from '../Components/GeneralStatistics'
+import OrderHistory from '../Components/OrderHistory'
 
 const Page = () => {
   const [ExchangeInfo, SetExchangeInfo] = useState([])
@@ -22,7 +23,9 @@ const Page = () => {
             <GeneralStatistics SelectedPair={SelectedPair} height={400} width={400} />
           </div>
           <br></br>
-          <div className="float-left h-auto">{/* datas */}</div>
+          <div className="float-left h-auto">
+            <OrderHistory SelectedPair={SelectedPair} />
+          </div>
           <br></br>
         </div>
       </div>

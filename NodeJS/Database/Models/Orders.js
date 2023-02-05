@@ -6,16 +6,24 @@ const Order = Schema(
   {
     OrderId: {
       type: String,
-      unique: true,
       required: true
     },
     Symbol: {
       type: String,
       required: true
     },
-    // status: {
-    //   type: String
-    // },
+    Side: {
+      type: String
+    },
+    Size: {
+      type: Number
+    },
+    StopPrice: {
+      type: Number
+    },
+    TakeProfitPrice: {
+      type: Number
+    },
     RealizedProfit: {
       type: Number
     },

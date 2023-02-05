@@ -1,5 +1,5 @@
 import axios from 'axios'
-const BaseUrl = 'http://127.0.0.1:4000'
+const BaseUrl = 'http://127.0.0.1:4000/api'
 
 const GetIchimoku = async (Symbol, Interval) => {
   let result = await axios.post(BaseUrl + '/charts/get_chart', { Symbol, Interval })

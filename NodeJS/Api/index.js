@@ -4,6 +4,7 @@ const ChartsRouter = require('./Routes/Charts')
 const BinanceRouter = require('./Routes/Binance')
 const BotsRouter = require('./Routes/Bots')
 const DatabaseRouter = require('./Routes/Database')
+const path = require('path')
 
 let App
 
@@ -21,10 +22,15 @@ module.exports.Main = () => {
     next()
   })
 
-  App.use('/charts', ChartsRouter)
-  App.use('/binance', BinanceRouter)
-  App.use('/bots', BotsRouter)
-  App.use('/database', DatabaseRouter)
+  App.use('/api/charts', ChartsRouter)
+  App.use('/api/binance', BinanceRouter)
+  App.use('/api/bots', BotsRouter)
+  App.use('/api/database', DatabaseRouter)
+
+  App.get('*', (req, res) => {
+    // console.log(__dirname)
+    res.sendFile(path.resolve(__dirname, '../public', 'index.html'))
+  })
 
   //Listen for requests
   App.listen(process.env.Port)

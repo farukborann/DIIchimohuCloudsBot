@@ -154,30 +154,22 @@ const CreateBotOrder = async (Order) => {
     TPOrderSettings.stopPrice = RoundStep(TPOrderSettings.stopPrice, TickSize)
   }
 
-  // let LastOrders = await Binance.Client.futuresBatchOrders({ batchOrders: NewOrders })
-
   let Orders = {}
   Orders.MOrder = await Binance.Client.futuresOrder(MainOrderSettings)
-  // if (MOrder.orderId) MOrderId = MOrder.orderId
-  // else return { error: 'Main order error!' }
 
   if (Order.SLOrder.IsActive) {
     Orders.SLOrder = await Binance.Client.futuresOrder(SLOrderSettings)
-    // if (SLOrder.orderId) SLOrderId = SLOrder.orderId
-    // else return { error: 'Stop loss order error! Please close take profit order manual.' }
   }
 
   if (Order.TPOrder.IsActive) {
     Orders.TPOrder = await Binance.Client.futuresOrder(TPOrderSettings)
-    // if (TPOrder.orderId) TPOrderId = TPOrder.orderId
-    // else return { error: 'Take profit order error!' }
   }
 
   console.log(Order.Symbol, ' Orders Success')
   return {
     Quantity: MainOrderSettings.quantity,
     Side: MainOrderSettings.side,
-    LastOrderds: Orders
+    Orders: Orders
   }
 }
 
@@ -198,19 +190,30 @@ module.exports.StartBot = async ({ Symbol, Interval, ConversionLength, BaseLengt
     // Wait for filling cancel order
     await new Promise((resolve) => setTimeout(resolve, 200))
     if (CrossType === 1) {
-      let LastOrders = await CreateBotOrder({ ...Cross1Order, Symbol })
-
-      await Database.AddOrder(Symbol, LastOrders.LastOrderds.MOrder.orderId)
-      Bot.LastOrders = LastOrders
+      let Result = await CreateBotOrder({ ...Cross1Order, Symbol })
+      await Database.AddOrder(
+        Result.Orders.MOrder.orderId,
+        Symbol,
+        Result.Side,
+        Cross1Order.Size,
+        Result.Orders.SLOrder ? Result.Orders.SLOrder.stopPrice : -1,
+        Result.Orders.TPOrder ? Result.Orders.TPOrder.stopPrice : -1
+      )
 
       let Now = new Date()
       Bot.Logs.push({ Date: Now, Cross: 1 })
       Logs.push({ Symbol, Date: Now, Cross: 1 })
     } else if (CrossType === 2) {
-      let LastOrders = await CreateBotOrder({ ...Cross2Order, Symbol })
+      let Result = await CreateBotOrder({ ...Cross2Order, Symbol })
 
-      await Database.AddOrder(Symbol, LastOrders.LastOrderds.MOrder.orderId)
-      Bot.LastOrders = LastOrders
+      await Database.AddOrder(
+        Result.Orders.MOrder.orderId,
+        Symbol,
+        Result.Side,
+        Cross2Order.Size,
+        Result.Orders.SLOrder ? Result.Orders.SLOrder.stopPrice : -1,
+        Result.Orders.TPOrder ? Result.Orders.TPOrder.stopPrice : -1
+      )
 
       let Now = new Date()
       Bot.Logs.push({ Date: Now, Cross: 2 })
@@ -238,11 +241,15 @@ module.exports.StopBot = (Symbol) => {
 }
 
 module.exports.Main = async () => {
-  await Binance.Client.ws.futuresUser((event) => {
+  await Binance.Client.ws.futuresUser(async (event) => {
+    // if (event.eventType === 'ORDER_TRADE_UPDATE') {
+    //   console.log(event.eventType, event.orderStatus, event.isReduceOnly, event.orderId) // 226967877 EOS 240857732 XRP  272279803 TRX
+    //   console.log(event.eventType === 'ORDER_TRADE_UPDATE', event.orderStatus === 'FILLED', event.isReduceOnly === true)
+    // }
     if (event.eventType === 'ORDER_TRADE_UPDATE' && event.orderStatus === 'FILLED' && event.isReduceOnly === true) {
-      Database.EndOrder(event.orderId, parseFloat(event.realizedProfit))
+      console.log(event)
+      let result = await Database.EndOrder(event.orderId, parseFloat(event.realizedProfit))
+      // console.log(result)
     }
   })
-  // console.log(await Database.GetGeneralStatistics('ADAUSDT'))
-  // console.log(await Database.GetLast20Order('ADAUSDT'))
 }
