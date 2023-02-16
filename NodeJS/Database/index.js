@@ -11,18 +11,26 @@ module.exports.Main = async () => {
   }
 }
 
-module.exports.AddOrder = async (OrderId, Symbol, Side, Size, StopPrice, TakeProfitPrice) => {
+module.exports.AddOrder = async (BotId, OrderId, Symbol, Side, Size, StopPrice, TakeProfitPrice) => {
+  let Order = await Orders.create({ BotId, OrderId, Symbol, Side, Size, StopPrice, TakeProfitPrice })
   console.log('Database Added => ', { OrderId, Symbol, Side, Size, StopPrice, TakeProfitPrice })
-  let Order = await Orders.create({ OrderId, Symbol, Side, Size, StopPrice, TakeProfitPrice })
   return Order
 }
 
-module.exports.EndOrder = async (Symbol, RealizedProfit) => {
-  let Order = await Orders.findOne({ Symbol })
-  console.log(Order)
+module.exports.EndOrder = async (BotId, Side, RealizedProfit) => {
+  console.log(BotId, Side, RealizedProfit)
+
+  let Order = await Orders.findOne({ BotId, Side }, {}, { sort: { createdAt: -1 } })
   if (!Order || Order.ClosedDate) return
 
-  let Result = await Orders.findOneAndUpdate({ Symbol }, { RealizedProfit, ClosedDate: new Date() })
+  let Result = await Orders.findOneAndUpdate(
+    { BotId, Side },
+    { RealizedProfit, ClosedDate: new Date() },
+    {
+      upsert: true,
+      sort: { createdAt: -1 }
+    }
+  )
   return Result
 }
 

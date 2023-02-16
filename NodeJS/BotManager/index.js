@@ -8,6 +8,18 @@ let ExchangeInfo
 module.exports.Bots = Bots
 module.exports.Logs = Logs
 
+function RandomId(length) {
+  let result = ''
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+  const charactersLength = characters.length
+  let counter = 0
+  while (counter < length) {
+    result += characters.charAt(Math.floor(Math.random() * charactersLength))
+    counter += 1
+  }
+  return result
+}
+
 const CancelOrders = async (Symbol) => {
   console.log('Orders Cancelling')
   let SymbolOrder = (await Binance.Client.futuresPositionRisk({ symbol: Symbol }))[0]
@@ -181,6 +193,7 @@ module.exports.StartBot = async ({ Symbol, Interval, ConversionLength, BaseLengt
     return { error: 'Symbol has bot' }
   }
 
+  let BotId = RandomId(40)
   let Calculation = await Binance.StartCalculateIchimoku(Symbol, Interval, ConversionLength, BaseLength, async (CrossType) => {
     let Bot = Bots.find((Bot) => {
       return Bot.Symbol === Symbol
@@ -192,6 +205,7 @@ module.exports.StartBot = async ({ Symbol, Interval, ConversionLength, BaseLengt
     if (CrossType === 1) {
       let Result = await CreateBotOrder({ ...Cross1Order, Symbol })
       await Database.AddOrder(
+        BotId,
         Result.Orders.MOrder.orderId,
         Symbol,
         Result.Side,
@@ -207,6 +221,7 @@ module.exports.StartBot = async ({ Symbol, Interval, ConversionLength, BaseLengt
       let Result = await CreateBotOrder({ ...Cross2Order, Symbol })
 
       await Database.AddOrder(
+        BotId,
         Result.Orders.MOrder.orderId,
         Symbol,
         Result.Side,
@@ -221,7 +236,7 @@ module.exports.StartBot = async ({ Symbol, Interval, ConversionLength, BaseLengt
     }
   })
 
-  Bots.push({ Symbol, Interval, ConversionLength, BaseLength, Cross1Order, Cross2Order, Calculation, Logs: [] })
+  Bots.push({ BotId, Symbol, Interval, ConversionLength, BaseLength, Cross1Order, Cross2Order, Calculation, Logs: [] })
   return { result: true }
 }
 
@@ -242,14 +257,15 @@ module.exports.StopBot = (Symbol) => {
 
 module.exports.Main = async () => {
   await Binance.Client.ws.futuresUser(async (event) => {
-    // if (event.eventType === 'ORDER_TRADE_UPDATE') {
-    //   console.log(event.eventType, event.orderStatus, event.isReduceOnly, event.orderId) // 226967877 EOS 240857732 XRP  272279803 TRX
-    //   console.log(event.eventType === 'ORDER_TRADE_UPDATE', event.orderStatus === 'FILLED', event.isReduceOnly === true)
-    // }
-    if (event.eventType === 'ORDER_TRADE_UPDATE' && event.orderStatus === 'FILLED' && event.isReduceOnly === true) {
+    if (event.orderType === 'MARKET') {
       console.log(event)
-      let result = await Database.EndOrder(event.orderId, parseFloat(event.realizedProfit))
-      // console.log(result)
+    }
+    if (event.eventType === 'ORDER_TRADE_UPDATE' && event.orderStatus === 'FILLED' && event.isReduceOnly === true) {
+      let Bot = Bots.find((bot) => bot.Symbol === event.symbol)
+      if (!Bot) return
+
+      let result = await Database.EndOrder(Bot.BotId, event.side === 'SELL' ? 'BUY' : 'SELL', parseFloat(event.realizedProfit))
+      console.log(result)
     }
   })
 }

@@ -1,9 +1,12 @@
 const Mongoose = require('mongoose')
 const Schema = Mongoose.Schema
-// const { softDeletePlugin } = require('soft-delete-plugin-mongoose')
 
 const Order = Schema(
   {
+    BotId: {
+      type: String,
+      required: true
+    },
     OrderId: {
       type: String,
       required: true
@@ -33,8 +36,6 @@ const Order = Schema(
   },
   { timestamps: true }
 )
-
-// Module.plugin(softDeletePlugin)
 
 const Modules = Mongoose.model('Orders', Order)
 module.exports = Modules
