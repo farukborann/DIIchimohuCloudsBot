@@ -9,6 +9,8 @@ import BotsList from '../Components/BotsList'
 import BotsLogs from '../Components/BotsLogs'
 import SymbolSettings from '../Components/SymbolSettings'
 
+import axios from 'axios'
+
 const Page = () => {
   const [ExchangeInfo, SetExchangeInfo] = useState([])
   const [SelectedPair, SetSelectedPair] = useState('BTCUSDT')
@@ -27,6 +29,10 @@ const Page = () => {
     AutoUpdate()
     Api.GetExchangeInfo().then((ExchangeInfo) => {
       SetExchangeInfo(ExchangeInfo.symbols.map((Symbol) => Symbol))
+    })
+
+    axios.get('http://127.0.0.1:4000/api/backtest/historical').then((res) => {
+      console.log(res.data)
     })
   }, [])
 

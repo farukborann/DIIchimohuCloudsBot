@@ -23,8 +23,8 @@ const GetOptions = (title, labels) => {
           }
         }
       }
-    ]
-    // colors: ['#00b746', '#2861fd', '#a21c1e']
+    ],
+    colors: ['#00b746', '#a21c1e']
   }
 }
 

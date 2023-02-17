@@ -20,12 +20,9 @@ module.exports.Intervals = {
   oneMonth: '1M'
 }
 
-// let BinanceClient
-
 module.exports.Main = async ({ apiKey, apiSecret }) => {
   const Settings = { apiKey, apiSecret }
 
-  // BinanceClient = Binance.default(Settings)
   module.exports.Client = Binance.default(Settings)
 
   let TestConnection = await module.exports.Client.futuresPing()
@@ -37,8 +34,8 @@ module.exports.Main = async ({ apiKey, apiSecret }) => {
   console.log('Binance Connection Failed !!!')
 }
 
-module.exports.GetKlines = async (Symbol, Interval, Limit) => {
-  let Klines = await module.exports.Client.futuresCandles({ symbol: Symbol, interval: Interval, limit: Limit })
+module.exports.GetKlines = async (Symbol, Interval, Limit, StartDate, EndDate) => {
+  let Klines = await module.exports.Client.futuresCandles({ symbol: Symbol, interval: Interval, limit: Limit, startTime: StartDate, endTime: EndDate })
   Klines = Klines.map((Kline) => {
     return Kline
   })
@@ -126,7 +123,7 @@ module.exports.StartCalculateIchimoku = async (Symbol, Interval, ConversionLengt
         kline.baseValue = baseValue
       }
 
-      let isCrossing = Helpers.DedectIndicatorCrossing(
+      let isCrossing = Helpers.DedectCross(
         Klines.map((Kline) => {
           return Kline.conversionValue
         }),

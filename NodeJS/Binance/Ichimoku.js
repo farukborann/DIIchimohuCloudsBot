@@ -1,12 +1,12 @@
 const { RoundStep } = require('./Helpers')
 
-module.exports.Calculate = (klines, conversionLength, baseLength, stepSize) => {
-  if (klines.length < Math.max(conversionLength, baseLength)) {
+module.exports.Calculate = (Klines, ConversionLength, BaseLength, StepSize) => {
+  if (Klines.length < Math.max(ConversionLength, BaseLength)) {
     return { error: { message: 'Klines length error' } }
   }
 
-  let conversionPeriots = klines.slice(klines.length - conversionLength, klines.length)
-  let basePeriots = klines.slice(klines.length - baseLength, klines.length)
+  let conversionPeriots = Klines.slice(Klines.length - ConversionLength, Klines.length)
+  let basePeriots = Klines.slice(Klines.length - BaseLength, Klines.length)
 
   let conversionResults = GetHighLow(conversionPeriots)
   let baseResults = GetHighLow(basePeriots)
@@ -14,14 +14,14 @@ module.exports.Calculate = (klines, conversionLength, baseLength, stepSize) => {
   let conversionValue = (conversionResults.high + conversionResults.low) / 2
   let baseValue = (baseResults.high + baseResults.low) / 2
 
-  return { conversionValue: RoundStep(conversionValue, stepSize), baseValue: RoundStep(baseValue, stepSize) }
+  return { conversionValue: RoundStep(conversionValue, StepSize), baseValue: RoundStep(baseValue, StepSize) }
 }
 
-const GetHighLow = (klines) => {
-  let high = klines[0].high
-  let low = klines[0].low
+const GetHighLow = (Klines) => {
+  let high = Klines[0].high
+  let low = Klines[0].low
 
-  klines.map((kline) => {
+  Klines.map((kline) => {
     if (kline.high > high) high = kline.high
     if (kline.low < low) low = kline.low
   })

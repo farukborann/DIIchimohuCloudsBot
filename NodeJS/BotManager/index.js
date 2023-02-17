@@ -257,15 +257,10 @@ module.exports.StopBot = (Symbol) => {
 
 module.exports.Main = async () => {
   await Binance.Client.ws.futuresUser(async (event) => {
-    if (event.orderType === 'MARKET') {
-      console.log(event)
-    }
     if (event.eventType === 'ORDER_TRADE_UPDATE' && event.orderStatus === 'FILLED' && event.isReduceOnly === true) {
       let Bot = Bots.find((bot) => bot.Symbol === event.symbol)
       if (!Bot) return
-
-      let result = await Database.EndOrder(Bot.BotId, event.side === 'SELL' ? 'BUY' : 'SELL', parseFloat(event.realizedProfit))
-      console.log(result)
+      await Database.EndOrder(Bot.BotId, event.side === 'SELL' ? 'BUY' : 'SELL', parseFloat(event.realizedProfit))
     }
   })
 }

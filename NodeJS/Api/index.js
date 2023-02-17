@@ -4,6 +4,7 @@ const ChartsRouter = require('./Routes/Charts')
 const BinanceRouter = require('./Routes/Binance')
 const BotsRouter = require('./Routes/Bots')
 const DatabaseRouter = require('./Routes/Database')
+const BacktestRouter = require('./Routes/Backtest')
 const path = require('path')
 
 let App
@@ -26,6 +27,7 @@ module.exports.Main = () => {
   App.use('/api/binance', BinanceRouter)
   App.use('/api/bots', BotsRouter)
   App.use('/api/database', DatabaseRouter)
+  App.use('/api/backtest', BacktestRouter)
 
   App.get('*', (req, res) => {
     // console.log(__dirname)
