@@ -30,7 +30,6 @@ module.exports.Main = () => {
   App.use('/api/backtest', BacktestRouter)
 
   App.get('*', (req, res) => {
-    // console.log(__dirname)
     res.sendFile(path.resolve(__dirname, '../public', 'index.html'))
   })
 

@@ -1,7 +1,7 @@
 import Api from '../../Others/Api'
 import { useEffect, useState } from 'react'
 
-const BotsList = ({ SelectedPair, className }) => {
+const OrderHistory = ({ SelectedPair, className }) => {
   const [Orders, SetOrders] = useState([])
 
   const Update = async () => {
@@ -53,4 +53,4 @@ const BotsList = ({ SelectedPair, className }) => {
   )
 }
 
-export default BotsList
+export default OrderHistory

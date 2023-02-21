@@ -56,6 +56,11 @@ const GetLast20Order = async (data) => {
   return result.data
 }
 
+const Backtest = async (data) => {
+  let result = await axios.post(BaseUrl + '/backtest', data)
+  return result.data
+}
+
 export default {
   GetExchangeInfo,
   GetIchimoku,
@@ -67,5 +72,6 @@ export default {
   SetSymbolSettings,
   GetSymbolPrice,
   GetGeneralStatistics,
-  GetLast20Order
+  GetLast20Order,
+  Backtest
 }

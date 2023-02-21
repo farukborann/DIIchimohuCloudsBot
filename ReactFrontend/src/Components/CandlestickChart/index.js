@@ -98,13 +98,8 @@ const Chart = ({ SelectedPair, SelectedInterval, Updater, SetUpdater, className,
 
   useEffect(() => {
     if (Updater !== true) return
-    // try {
     Update()
     SetUpdater(false)
-    // } catch (ex) {
-    //   console.log(ex)
-    //   SetUpdater(false)
-    // }
   }, [Updater])
 
   return <ApexChart options={Options} series={[KlineSerie, ConversionLineSerie, BaseLineSerie]} className={className} height={height} width={width} />

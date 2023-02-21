@@ -4,12 +4,10 @@ import CandlestickChart from '../Components/CandlestickChart'
 import UpdateChartButton from '../Components/CandlestickChart/UpdateButton'
 import PairList from '../Components/PairList'
 import IntervalList from '../Components/IntervalList'
-import BotManger from '../Components/BotManger'
+import BotManager from '../Components/BotManager'
 import BotsList from '../Components/BotsList'
 import BotsLogs from '../Components/BotsLogs'
 import SymbolSettings from '../Components/SymbolSettings'
-
-import axios from 'axios'
 
 const Page = () => {
   const [ExchangeInfo, SetExchangeInfo] = useState([])
@@ -29,10 +27,6 @@ const Page = () => {
     AutoUpdate()
     Api.GetExchangeInfo().then((ExchangeInfo) => {
       SetExchangeInfo(ExchangeInfo.symbols.map((Symbol) => Symbol))
-    })
-
-    axios.get('http://127.0.0.1:4000/api/backtest/historical').then((res) => {
-      console.log(res.data)
     })
   }, [])
 
@@ -72,7 +66,7 @@ const Page = () => {
           </div>
           <br></br>
           <div className="float-left h-auto">
-            <BotManger className="float-left w-[810px] h-fit" SelectedPair={SelectedPair} SelectedInterval={SelectedInterval} SetUpdater={SetAutoUpdater} Bots={Bots} ExchangeInfo={ExchangeInfo} />
+            <BotManager className="float-left w-[810px] h-fit" SelectedPair={SelectedPair} SelectedInterval={SelectedInterval} SetUpdater={SetAutoUpdater} Bots={Bots} ExchangeInfo={ExchangeInfo} />
             <div className="float-left w-[810px] h-auto">
               <BotsLogs className="float-left w-[810px] h-[545px] flex flex-col" Updater={AutoUpdater} />
             </div>
