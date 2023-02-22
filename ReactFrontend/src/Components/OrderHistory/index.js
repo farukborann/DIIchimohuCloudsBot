@@ -1,12 +1,13 @@
 import Api from '../../Others/Api'
 import { useEffect, useState } from 'react'
+import { format } from 'date-fns'
 
 const OrderHistory = ({ SelectedPair, className }) => {
   const [Orders, SetOrders] = useState([])
 
   const Update = async () => {
     let _Orders = await Api.GetLast20Order({ Symbol: SelectedPair })
-    SetOrders(_Orders)
+    SetOrders(_Orders.reverse())
   }
 
   useEffect(() => {
@@ -42,7 +43,7 @@ const OrderHistory = ({ SelectedPair, className }) => {
                   <td className="text-center">{Order.StopPrice}</td>
                   <td className="text-center">{Order.TakeProfitPrice}</td>
                   <td className="text-center">{Order.RealizedProfit}</td>
-                  <td className="text-center">{Order.ClosedDate}</td>
+                  <td className="text-center">{format(new Date(Order.ClosedDate), 'HH:mm dd/MM/yyyy')}</td>
                 </tr>
               </>
             )

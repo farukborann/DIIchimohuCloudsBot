@@ -5,7 +5,7 @@ const OrderHistory = ({ Result, className }) => {
   const [Orders, SetOrders] = useState([])
 
   const Update = async () => {
-    SetOrders(Result.AllOrders)
+    SetOrders(Result.AllOrders.reverse())
   }
 
   useEffect(() => {
@@ -24,6 +24,7 @@ const OrderHistory = ({ Result, className }) => {
             <th>Open Price</th>
             <th>Close Price</th>
             <th>Close Type</th>
+            <th>Open Date</th>
             <th>Close Date</th>
             <th>Profit</th>
             <th>Stop Price</th>
@@ -40,6 +41,7 @@ const OrderHistory = ({ Result, className }) => {
                   <td className="text-center">{Order.Price}</td>
                   <td className="text-center">{Order.ClosePrice}</td>
                   <td className="text-center">{Order.CloseType}</td>
+                  <td className="text-center">{format(new Date(Order.OpenDate), 'HH:mm dd/MM/yyyy')}</td>
                   <td className="text-center">{format(new Date(Order.CloseDate), 'HH:mm dd/MM/yyyy')}</td>
                   <td className="text-center">{Math.round(Order.Profit * 100000000) / 100000000}</td>
                   <td className="text-center">{Math.round(Order.SLOrder.Price * 100000000) / 100000000}</td>

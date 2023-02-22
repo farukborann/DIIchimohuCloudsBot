@@ -176,6 +176,7 @@ module.exports.CalculateOrders = (Klines, Cross1Order, Cross2Order) => {
 
       // New Order
       LastOrder = Klines[i].indicatorStatus === 1 ? JSON.parse(JSON.stringify(Cross1Order)) : Klines[i].indicatorStatus === 2 ? JSON.parse(JSON.stringify(Cross2Order)) : undefined
+      LastOrder.OpenDate = Klines[i].openTime
       SetLastOrderPercentModeAndLastPrice(Klines[i].close)
     }
   }
@@ -187,40 +188,3 @@ module.exports.CalculateOrders = (Klines, Cross1Order, Cross2Order) => {
 
   return { AllOrders, TotalProfit }
 }
-
-// {
-//   "Symbol": "BTCUSDT",
-//   "Interval": "1m",
-//   "ConversionLength": 9,
-//   "BaseLength": 26,
-//   "Cross1Order": {
-//       "Price": -1,
-//       "Size": 23.9,
-//       "Side": "Short",
-//       "TPOrder": {
-//           "IsActive": true,
-//           "Price": 2,
-//           "PercentMode": true,
-//       },
-//       "SLOrder": {
-//           "IsActive": true,
-//           "Price": 2,
-//           "PercentMode": true,
-//       }
-//   },
-//   "Cross2Order": {
-//       "Price": -1,
-//       "Size": 23.9,
-//       "Side": "Long",
-//       "TPOrder": {
-//           "IsActive": true,
-//           "Price": 2,
-//           "PercentMode": true,
-//       },
-//       "SLOrder": {
-//           "IsActive": true,
-//           "Price": 2,
-//           "PercentMode": true,
-//       }
-//   }
-// }
