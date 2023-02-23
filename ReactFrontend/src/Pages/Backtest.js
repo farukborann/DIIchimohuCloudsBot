@@ -6,6 +6,7 @@ import Statistics from '../Components/Backtest/GeneralStatistics'
 import OrderHistory from '../Components/Backtest/OrderHistory'
 import CandlestickChart from '../Components/Backtest/CandlestickChart'
 import Manager from '../Components/Backtest/Manager'
+import DownloadButton from '../Components/Backtest/DownloadButton'
 
 const Page = () => {
   const [ExchangeInfo, SetExchangeInfo] = useState([])
@@ -25,8 +26,12 @@ const Page = () => {
         <PairList className="float-left border-2 border-gray-300  outline-none" SelectedPair={SelectedPair} SetSelectedPair={SetSelectedPair} ExchangeInfo={ExchangeInfo} />
         <div className="float-left">
           <div className="float-left w-fit h-fit">
-            <IntervalList className="border-2 border-gray-300 h-fit outline-none" SelectedInterval={SelectedInterval} SetSelectedInterval={SetSelectedInterval} />
-            <Manager className="float-left w-[810px] h-fit" SelectedPair={SelectedPair} SelectedInterval={SelectedInterval} Result={Result} SetResult={SetResult} />
+            <Manager className="float-left w-[810px] h-fit" SelectedPair={SelectedPair} SelectedInterval={SelectedInterval} SetResult={SetResult} />
+            <div className="float-left w-fit h-fit">
+              <IntervalList className="border-2 border-gray-300 h-fit outline-none" SelectedInterval={SelectedInterval} SetSelectedInterval={SetSelectedInterval} />
+              <br></br>
+              <DownloadButton Result={Result} SelectedPair={SelectedPair} SelectedInterval={SelectedInterval} />
+            </div>
           </div>
           <br></br>
           <div className="float-left w-fit h-fit">

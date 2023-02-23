@@ -45,7 +45,7 @@ const Chart = ({ SelectedPair, SelectedInterval, Result, className, height, widt
     Klines.forEach((Kline) => {
       if (Kline.conversionValue && Kline.baseValue) {
         let openTime = new Date(new Date(Kline.openTime).toLocaleString('en-EN'))
-        console.log(openTime)
+
         conversionLineData.push({
           x: openTime,
           y: Kline.conversionValue

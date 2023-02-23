@@ -106,7 +106,7 @@ const BotManager = ({ SelectedPair, SelectedInterval, SetResult, className }) =>
           let result = await Api.Backtest(data)
           if (result.error) alert(result.error)
           else {
-            SetResult(result)
+            SetResult({ ...result, StartDate, EndDate })
           }
         }}
       >

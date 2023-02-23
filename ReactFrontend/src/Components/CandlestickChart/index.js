@@ -12,7 +12,10 @@ const GetOptions = (title) => {
       width: [3, 1]
     },
     xaxis: {
-      type: 'datetime'
+      type: 'datetime',
+      labels: {
+        datetimeUTC: false
+      }
     },
     colors: ['#00b746', '#2861fd', '#a21c1e'],
     markers: {
@@ -39,17 +42,19 @@ const Chart = ({ SelectedPair, SelectedInterval, Updater, SetUpdater, className,
 
         // Has ichimoku
         newKlines.forEach((Kline) => {
+          let openTime = new Date(new Date(Kline.openTime).toLocaleString('en-EN'))
+          console.log(openTime)
           if (Kline.conversionValue || Kline.baseValue) {
             conversionLineData.push({
-              x: new Date(Kline.openTime),
+              x: openTime,
               y: Kline.conversionValue
             })
             baseLineData.push({
-              x: new Date(Kline.openTime),
+              x: openTime,
               y: Kline.baseValue
             })
             klinesData.push({
-              x: new Date(Kline.openTime),
+              x: openTime,
               y: [Kline.open, Kline.high, Kline.low, Kline.close]
             })
           }
