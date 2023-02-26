@@ -41,7 +41,6 @@ const Chart = ({ Result }) => {
     SetProfitSum(Math.round(Result.Statistics.RealizedProfitsSum * 100000000) / 100000000)
     SetOrderCount(Result.Statistics.OrderCount)
     SetSize(Result.AllOrders.length ? Result.AllOrders[0].Size : 0)
-    console.log(Result)
   }
 
   useEffect(() => {
@@ -52,7 +51,14 @@ const Chart = ({ Result }) => {
 
   return (
     <div className="float-left inline-flex p-5 border-2 border-gray-300 outline-none">
-      <ApexChart options={ProfitLossSettings} series={ProfitLossData} type="donut" height={400} width={720} className={'ml-10'} />
+      <ApexChart
+        options={ProfitLossSettings}
+        series={ProfitLossData}
+        type="donut"
+        height={400}
+        width={720}
+        className={'ml-10'}
+      />
       <div className="ml-10">
         <label>Toplam {Math.round(ProfitSum * 100) / 100} USDT Kar/Zarar</label>
         <br></br>

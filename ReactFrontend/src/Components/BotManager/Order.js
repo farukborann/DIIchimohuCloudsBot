@@ -48,9 +48,18 @@ const Order = ({ Values, SetValues, className }) => {
           SetValues({ ...Values, Size: e.target.value })
         }}
       ></input>
-
+      <input
+        type="checkbox"
+        checked={Values.SizePercentMode}
+        className="ml-2 border-2 border-gray-300"
+        onChange={(e) => {
+          let _Values = { ...Values }
+          _Values.SizePercentMode = e.target.checked
+          SetValues(_Values)
+        }}
+      ></input>{' '}
+      PM (%)
       <br></br>
-
       <label className="ml-5">
         <input // Take Profit Checkbox
           checked={Values.TPOrder.IsActive}
@@ -87,7 +96,7 @@ const Order = ({ Values, SetValues, className }) => {
                 SetValues(_Values)
               }}
             ></input>{' '}
-            Percent Mode (%)
+            PM (%)
             <select
               value={Values.TPOrder.WorkingType}
               className="ml-2 border-2 border-gray-300"
@@ -105,9 +114,7 @@ const Order = ({ Values, SetValues, className }) => {
       ) : (
         <></>
       )}
-
       <br></br>
-
       <label className="ml-5">
         <input // Stop Loss Checkbox
           checked={Values.SLOrder.IsActive}
@@ -121,7 +128,6 @@ const Order = ({ Values, SetValues, className }) => {
         ></input>
         Stop Loss{' '}
       </label>
-
       {Values.SLOrder.IsActive ? (
         <>
           <label className="ml-4">
@@ -145,7 +151,7 @@ const Order = ({ Values, SetValues, className }) => {
                 SetValues(_Values)
               }}
             ></input>{' '}
-            Percent Mode (%)
+            PM (%)
             <select
               value={Values.SLOrder.WorkingType}
               className="ml-2 border-2 border-gray-300"

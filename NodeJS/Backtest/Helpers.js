@@ -29,6 +29,9 @@ module.exports.DedectAllCrosses = (Klines, StartIndex) => {
 
   // Where is line crosses
   let CrossesCount = 0
+  if (!Klines.length) return { CrossesCount }
+  else if (Klines.length < StartIndex + 1) return { CrossesCount }
+
   let LastStatus = Klines[StartIndex].indicatorStatus
   for (let i = StartIndex + 1; i < Klines.length; i++) {
     if (Klines[i].indicatorStatus !== 0 && Klines[i].indicatorStatus !== LastStatus) {

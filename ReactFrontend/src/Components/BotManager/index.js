@@ -30,7 +30,14 @@ const B2TCrossDefault = {
   SLOrder: { IsActive: true, Price: 2, PercentMode: true, WorkingType: 'Mark' }
 }
 
-const BotManager = ({ SelectedPair, SelectedInterval, ExchangeInfo, SetUpdater, Bots, className }) => {
+const BotManager = ({
+  SelectedPair,
+  SelectedInterval,
+  ExchangeInfo,
+  SetUpdater,
+  Bots,
+  className
+}) => {
   const [IndicatorValues, SetIndicatorValues] = useState({ CLL: 9, BLL: 26 })
   const [T2BCross, SetT2BCross] = useState(T2BCrossDefault)
   const [B2TCross, SetB2TCross] = useState(B2TCrossDefault)
@@ -47,9 +54,15 @@ const BotManager = ({ SelectedPair, SelectedInterval, ExchangeInfo, SetUpdater, 
     let LastPrice = (await Api.GetSymbolPrice({ Symbol: SelectedPair })).Price
     SetSelectedPairExchangeInfo(SelectedPairExchangeInfo)
 
-    let LotSizeFilter = SelectedPairExchangeInfo.filters.find((filter) => filter.filterType === 'LOT_SIZE')
-    let NationalFilter = SelectedPairExchangeInfo.filters.find((filter) => filter.filterType === 'MIN_NOTIONAL')
-    let PriceFilter = SelectedPairExchangeInfo.filters.find((filter) => filter.filterType === 'PRICE_FILTER')
+    let LotSizeFilter = SelectedPairExchangeInfo.filters.find(
+      (filter) => filter.filterType === 'LOT_SIZE'
+    )
+    let NationalFilter = SelectedPairExchangeInfo.filters.find(
+      (filter) => filter.filterType === 'MIN_NOTIONAL'
+    )
+    let PriceFilter = SelectedPairExchangeInfo.filters.find(
+      (filter) => filter.filterType === 'PRICE_FILTER'
+    )
 
     let MinQty = LotSizeFilter.minQty
     let MinNational = NationalFilter.notional
@@ -111,21 +124,44 @@ const BotManager = ({ SelectedPair, SelectedInterval, ExchangeInfo, SetUpdater, 
 
       <label>Yukarıdan Aşağı Kesişim (Mavi X Kırmızı)</label>
       <br></br>
-      <Order className={'mt-2 border-2 border-slate-300 p-2'} Values={T2BCross} SetValues={SetT2BCross} SelectedPairExchangeInfo={SelectedPairExchangeInfo} />
+      <Order
+        className={'mt-2 border-2 border-slate-300 p-2'}
+        Values={T2BCross}
+        SetValues={SetT2BCross}
+        SelectedPairExchangeInfo={SelectedPairExchangeInfo}
+      />
 
       <br></br>
 
       <label>Aşağıdan Yukarı Kesişim (Kırmızı X Mavi)</label>
       <br></br>
-      <Order className={'mt-2 border-2 border-slate-300 p-2'} Values={B2TCross} SetValues={SetB2TCross} SelectedPairExchangeInfo={SelectedPairExchangeInfo} />
+      <Order
+        className={'mt-2 border-2 border-slate-300 p-2'}
+        Values={B2TCross}
+        SetValues={SetB2TCross}
+        SelectedPairExchangeInfo={SelectedPairExchangeInfo}
+      />
 
       <br></br>
 
-      <label>Limit Order Price = -1 → Last Price</label>
+      <label>
+        Limit Order Price = -1 → Last Price
+        <br></br>
+        PM → Percent Mode
+        <br></br>
+        Size PM Only Available For USDT Pairs !! (Size = Balance * Size Percent * Leverage)
+      </label>
       <button
         className="float-right border-2 border-gray-300 p-2"
         onClick={async () => {
-          let data = { Symbol: SelectedPair, Interval: SelectedInterval, ConversionLength: IndicatorValues.CLL, BaseLength: IndicatorValues.BLL, Cross1Order: T2BCross, Cross2Order: B2TCross }
+          let data = {
+            Symbol: SelectedPair,
+            Interval: SelectedInterval,
+            ConversionLength: IndicatorValues.CLL,
+            BaseLength: IndicatorValues.BLL,
+            Cross1Order: T2BCross,
+            Cross2Order: B2TCross
+          }
           let result = await Api.StartBot(data)
           if (result.error) alert(result.error)
           else {

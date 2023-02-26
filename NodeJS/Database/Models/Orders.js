@@ -15,6 +15,12 @@ const Order = Schema(
       type: String,
       required: true
     },
+    Interval: {
+      type: String
+    },
+    IndicatorSettings: {
+      type: String
+    },
     Side: {
       type: String
     },

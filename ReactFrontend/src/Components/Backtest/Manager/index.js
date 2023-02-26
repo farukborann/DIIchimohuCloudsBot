@@ -1,32 +1,23 @@
 import Api from '../../../Others/Api'
 import Order from './Order'
-import { useState } from 'react'
+import React from 'react'
 
-const T2BCrossDefault = {
-  OrderType: 'Limit',
-  Size: 100,
-  Side: 'Short',
-  MinSize: 0,
-  TPOrder: { IsActive: true, Price: 2, PercentMode: true, WorkingType: 'Mark' },
-  SLOrder: { IsActive: true, Price: 2, PercentMode: true, WorkingType: 'Mark' }
-}
-
-const B2TCrossDefault = {
-  OrderType: 'Limit',
-  Size: 100,
-  Side: 'Long',
-  MinSize: 0,
-  TPOrder: { IsActive: true, Price: 2, PercentMode: true, WorkingType: 'Mark' },
-  SLOrder: { IsActive: true, Price: 2, PercentMode: true, WorkingType: 'Mark' }
-}
-
-const BotManager = ({ SelectedPair, SelectedInterval, SetResult, className }) => {
-  const [IndicatorValues, SetIndicatorValues] = useState({ CLL: 9, BLL: 26 })
-  const [T2BCross, SetT2BCross] = useState(T2BCrossDefault)
-  const [StartDate, SetStartDate] = useState()
-  const [EndDate, SetEndDate] = useState()
-  const [B2TCross, SetB2TCross] = useState(B2TCrossDefault)
-
+const BotManager = ({
+  SelectedPair,
+  SelectedInterval,
+  T2BCross,
+  B2TCross,
+  StartDate,
+  EndDate,
+  IndicatorValues,
+  SetResult,
+  SetT2BCross,
+  SetB2TCross,
+  SetStartDate,
+  SetEndDate,
+  SetIndicatorValues,
+  className
+}) => {
   return (
     <div className={'p-5 border-2 border-gray-300 ' + className}>
       <label>Tarihler</label>
@@ -79,13 +70,21 @@ const BotManager = ({ SelectedPair, SelectedInterval, SetResult, className }) =>
 
       <label>Yukarıdan Aşağı Kesişim (Mavi X Kırmızı)</label>
       <br></br>
-      <Order className={'mt-2 border-2 border-slate-300 p-2'} Values={T2BCross} SetValues={SetT2BCross} />
+      <Order
+        className={'mt-2 border-2 border-slate-300 p-2'}
+        Values={T2BCross}
+        SetValues={SetT2BCross}
+      />
 
       <br></br>
 
       <label>Aşağıdan Yukarı Kesişim (Kırmızı X Mavi)</label>
       <br></br>
-      <Order className={'mt-2 border-2 border-slate-300 p-2'} Values={B2TCross} SetValues={SetB2TCross} />
+      <Order
+        className={'mt-2 border-2 border-slate-300 p-2'}
+        Values={B2TCross}
+        SetValues={SetB2TCross}
+      />
 
       <br></br>
 
@@ -103,10 +102,10 @@ const BotManager = ({ SelectedPair, SelectedInterval, SetResult, className }) =>
             Cross1Order: T2BCross,
             Cross2Order: B2TCross
           }
-          let result = await Api.Backtest(data)
-          if (result.error) alert(result.error)
+          let Result = await Api.Backtest(data)
+          if (Result.error) alert(Result.error)
           else {
-            SetResult({ ...result, StartDate, EndDate })
+            SetResult(Result)
           }
         }}
       >

@@ -1,5 +1,5 @@
-const Mongoose = require('mongoose') // Terminal logging
-const Orders = require('./Models/Orders') // Terminal logging
+const Mongoose = require('mongoose')
+const Orders = require('./Models/Orders')
 
 module.exports.Main = async () => {
   try {
@@ -11,9 +11,9 @@ module.exports.Main = async () => {
   }
 }
 
-module.exports.AddOrder = async (BotId, OrderId, Symbol, Side, Size, StopPrice, TakeProfitPrice) => {
-  let Order = await Orders.create({ BotId, OrderId, Symbol, Side, Size, StopPrice, TakeProfitPrice })
-  console.log('Database Added => ', { OrderId, Symbol, Side, Size, StopPrice, TakeProfitPrice })
+module.exports.AddOrder = async (BotId, OrderId, Symbol, Interval, IndicatorSettings, Side, Size, StopPrice, TakeProfitPrice) => {
+  let Order = await Orders.create({ BotId, OrderId, Symbol, Interval, IndicatorSettings, Side, Size, StopPrice, TakeProfitPrice })
+  console.log('Database Added => ', { OrderId, Symbol, Interval, IndicatorSettings, Side, Size, StopPrice, TakeProfitPrice })
   return Order
 }
 
@@ -54,7 +54,38 @@ module.exports.GetGeneralStatistics = async (Symbol) => {
   return { OrderCount, ResultedOrderCount, ProfitedOrderCount, LossedOrderCount, RealizedProfitsSum }
 }
 
-module.exports.GetLast20Order = async (Symbol) => {
-  let _Orders = await Orders.find({ Symbol }).limit(20).lean()
+module.exports.GetLast100Order = async (Symbol) => {
+  let _Orders = (await Orders.find({ Symbol }).limit(100).lean()).map((Order) => {
+    return {
+      BotId: Order.BotId,
+      OrderId: Order.OrderId,
+      Symbol: Order.Symbol,
+      Side: Order.Side,
+      Size: Order.Size,
+      StopPrice: Order.StopPrice,
+      TakeProfitPrice: Order.TakeProfitPrice,
+      OpenDate: Order.createdAt,
+      ClosedDate: Order.ClosedDate,
+      RealizedProfit: Order.RealizedProfit
+    }
+  })
+  return _Orders
+}
+
+module.exports.GetAllOrders = async (Symbol) => {
+  let _Orders = (await Orders.find({ Symbol }).lean()).map((Order) => {
+    return {
+      BotId: Order.BotId,
+      OrderId: Order.OrderId,
+      Symbol: Order.Symbol,
+      Side: Order.Side,
+      Size: Order.Size,
+      StopPrice: Order.StopPrice,
+      TakeProfitPrice: Order.TakeProfitPrice,
+      OpenDate: Order.createdAt,
+      ClosedDate: Order.ClosedDate,
+      RealizedProfit: Order.RealizedProfit
+    }
+  })
   return _Orders
 }

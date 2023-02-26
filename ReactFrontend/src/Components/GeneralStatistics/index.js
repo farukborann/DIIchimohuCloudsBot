@@ -28,8 +28,11 @@ const GetOptions = (title, labels) => {
   }
 }
 
-const Chart = ({ SelectedPair, className, height, width }) => {
-  const ResultedSettings = GetOptions('Sonuçlanmış / Sonuçlanmamış İşlemler', ['Sonuçlanmış', 'Sonuçlanmamış'])
+const Chart = ({ SelectedPair }) => {
+  const ResultedSettings = GetOptions('Sonuçlanmış / Sonuçlanmamış İşlemler', [
+    'Sonuçlanmış',
+    'Sonuçlanmamış'
+  ])
   const ProfitLossSettings = GetOptions('Karlı / Zararlı İşlemler', ['Karlı', 'Zararlı'])
   const [ResultedData, SetResultedData] = useState([])
   const [ProfitLossData, SetProfitLossData] = useState([])
@@ -40,7 +43,10 @@ const Chart = ({ SelectedPair, className, height, width }) => {
     if (!SelectedPair) return
 
     Api.GetGeneralStatistics({ Symbol: SelectedPair }).then((Statistics) => {
-      SetResultedData([Statistics.ResultedOrderCount, Statistics.OrderCount - Statistics.ResultedOrderCount])
+      SetResultedData([
+        Statistics.ResultedOrderCount,
+        Statistics.OrderCount - Statistics.ResultedOrderCount
+      ])
       SetProfitLossData([Statistics.ProfitedOrderCount, Statistics.LossedOrderCount])
       SetProfitSum(Statistics.RealizedProfitsSum)
       SetOrderCount(Statistics.OrderCount)
@@ -53,8 +59,21 @@ const Chart = ({ SelectedPair, className, height, width }) => {
   // className={className}
   return (
     <div className="float-left inline-flex p-5 border-2 border-gray-300 outline-none">
-      <ApexChart options={ResultedSettings} series={ResultedData} type="donut" height={400} width={400} />
-      <ApexChart options={ProfitLossSettings} series={ProfitLossData} type="donut" height={400} width={400} className={'ml-10'} />
+      <ApexChart
+        options={ResultedSettings}
+        series={ResultedData}
+        type="donut"
+        height={400}
+        width={400}
+      />
+      <ApexChart
+        options={ProfitLossSettings}
+        series={ProfitLossData}
+        type="donut"
+        height={400}
+        width={400}
+        className={'ml-10'}
+      />
       <div className="ml-10">
         <label>Toplam {ProfitSum} USDT Kar/Zarar</label>
         <br></br>

@@ -51,13 +51,33 @@ const GetGeneralStatistics = async (data) => {
   return result.data
 }
 
-const GetLast20Order = async (data) => {
+const GetLastOrders = async (data) => {
   let result = await axios.post(BaseUrl + '/database/get_last_orders', data)
+  return result.data
+}
+
+const GetAllOrders = async (data) => {
+  let result = await axios.post(BaseUrl + '/database/get_all_orders', data)
   return result.data
 }
 
 const Backtest = async (data) => {
   let result = await axios.post(BaseUrl + '/backtest', data)
+  return result.data
+}
+
+const GetFavorites = async () => {
+  let result = await axios.get(BaseUrl + '/database/favorites/')
+  return result.data
+}
+
+const AddFavorite = async (data) => {
+  let result = await axios.post(BaseUrl + '/database/favorites/add', data)
+  return result.data
+}
+
+const DelFavorite = async (data) => {
+  let result = await axios.post(BaseUrl + '/database/favorites/del', data)
   return result.data
 }
 
@@ -72,6 +92,10 @@ export default {
   SetSymbolSettings,
   GetSymbolPrice,
   GetGeneralStatistics,
-  GetLast20Order,
+  GetLastOrders,
+  GetAllOrders,
+  GetFavorites,
+  AddFavorite,
+  DelFavorite,
   Backtest
 }

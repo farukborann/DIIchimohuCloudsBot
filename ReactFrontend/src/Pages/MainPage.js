@@ -24,10 +24,11 @@ const Page = () => {
     }, (61 - new Date().getSeconds()) * 1000)
   }
   useEffect(() => {
-    AutoUpdate()
+    // AutoUpdate()
     Api.GetExchangeInfo().then((ExchangeInfo) => {
       SetExchangeInfo(ExchangeInfo.symbols.map((Symbol) => Symbol))
     })
+    SetManuelUpdater(true)
   }, [])
 
   useEffect(() => {
@@ -37,7 +38,14 @@ const Page = () => {
   return (
     <>
       <div className="float-left m-5">
-        <PairList className="float-left border-2 border-gray-300  outline-none" SelectedPair={SelectedPair} SetSelectedPair={SetSelectedPair} ExchangeInfo={ExchangeInfo} />
+        <PairList
+          className="float-left border-2 border-gray-300  outline-none"
+          SelectedPair={SelectedPair}
+          SetSelectedPair={SetSelectedPair}
+          ExchangeInfo={ExchangeInfo}
+          Updater={ManuelUpdater}
+          SetUpdater={SetManuelUpdater}
+        />
         <div className="float-left">
           <div className="float-left w-fit h-fit">
             <CandlestickChart
@@ -50,7 +58,11 @@ const Page = () => {
               SetUpdater={SetAutoUpdater}
             />
             <div className="float-left">
-              <IntervalList className="border-2 border-gray-300 h-fit outline-none" SelectedInterval={SelectedInterval} SetSelectedInterval={SetSelectedInterval} />
+              <IntervalList
+                className="border-2 border-gray-300 h-fit outline-none"
+                SelectedInterval={SelectedInterval}
+                SetSelectedInterval={SetSelectedInterval}
+              />
               <br></br>
               <UpdateChartButton SetUpdater={SetManuelUpdater} />
             </div>
@@ -66,14 +78,29 @@ const Page = () => {
           </div>
           <br></br>
           <div className="float-left h-auto">
-            <BotManager className="float-left w-[810px] h-fit" SelectedPair={SelectedPair} SelectedInterval={SelectedInterval} SetUpdater={SetAutoUpdater} Bots={Bots} ExchangeInfo={ExchangeInfo} />
+            <BotManager
+              className="float-left w-[810px] h-fit"
+              SelectedPair={SelectedPair}
+              SelectedInterval={SelectedInterval}
+              SetUpdater={SetAutoUpdater}
+              Bots={Bots}
+              ExchangeInfo={ExchangeInfo}
+            />
             <div className="float-left w-[810px] h-auto">
-              <BotsLogs className="float-left w-[810px] h-[545px] flex flex-col" Updater={AutoUpdater} />
+              <BotsLogs
+                className="float-left w-[810px] h-[545px] flex flex-col"
+                Updater={AutoUpdater}
+              />
             </div>
           </div>
           <br></br>
           <div className="float-left">
-            <SymbolSettings className="float-left w-fit h-fit" SelectedPair={SelectedPair} Updater={ManuelUpdater} SetUpdater={SetManuelUpdater} />
+            <SymbolSettings
+              className="float-left w-fit h-fit"
+              SelectedPair={SelectedPair}
+              Updater={ManuelUpdater}
+              SetUpdater={SetManuelUpdater}
+            />
           </div>
         </div>
       </div>

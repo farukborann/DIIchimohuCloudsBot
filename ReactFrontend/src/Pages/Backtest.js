@@ -6,36 +6,124 @@ import Statistics from '../Components/Backtest/GeneralStatistics'
 import OrderHistory from '../Components/Backtest/OrderHistory'
 import CandlestickChart from '../Components/Backtest/CandlestickChart'
 import Manager from '../Components/Backtest/Manager'
-import DownloadButton from '../Components/Backtest/DownloadButton'
+import GeneralTests from '../Components/Backtest/GeneralTests'
+
+const T2BCrossDefault = {
+  OrderType: 'Limit',
+  Size: 100,
+  Side: 'Short',
+  MinSize: 0,
+  TPOrder: {
+    IsActive: true,
+    Price: 2,
+    PercentMode: true,
+    WorkingType: 'Mark'
+  },
+  SLOrder: {
+    IsActive: true,
+    Price: 2,
+    PercentMode: true,
+    WorkingType: 'Mark'
+  }
+}
+
+const B2TCrossDefault = {
+  OrderType: 'Limit',
+  Size: 100,
+  Side: 'Long',
+  MinSize: 0,
+  TPOrder: {
+    IsActive: true,
+    Price: 2,
+    PercentMode: true,
+    WorkingType: 'Mark'
+  },
+  SLOrder: {
+    IsActive: true,
+    Price: 2,
+    PercentMode: true,
+    WorkingType: 'Mark'
+  }
+}
 
 const Page = () => {
   const [ExchangeInfo, SetExchangeInfo] = useState([])
   const [SelectedPair, SetSelectedPair] = useState('BTCUSDT')
   const [SelectedInterval, SetSelectedInterval] = useState('1m')
+  const [IndicatorValues, SetIndicatorValues] = useState({ CLL: 9, BLL: 26 })
+  const [T2BCross, SetT2BCross] = useState(T2BCrossDefault)
+  const [StartDate, SetStartDate] = useState()
+  const [EndDate, SetEndDate] = useState()
+  const [B2TCross, SetB2TCross] = useState(B2TCrossDefault)
+  const [Updater, SetUpdater] = useState(false)
   const [Result, SetResult] = useState()
 
   useEffect(() => {
     Api.GetExchangeInfo().then((ExchangeInfo) => {
       SetExchangeInfo(ExchangeInfo.symbols.map((Symbol) => Symbol))
     })
+    SetUpdater(true)
   }, [])
 
   return (
     <>
       <div className="float-left m-5">
-        <PairList className="float-left border-2 border-gray-300  outline-none" SelectedPair={SelectedPair} SetSelectedPair={SetSelectedPair} ExchangeInfo={ExchangeInfo} />
+        <PairList
+          className="float-left border-2 border-gray-300  outline-none"
+          SelectedPair={SelectedPair}
+          SetSelectedPair={SetSelectedPair}
+          Updater={Updater}
+          SetUpdater={SetUpdater}
+          ExchangeInfo={ExchangeInfo}
+        />
         <div className="float-left">
           <div className="float-left w-fit h-fit">
-            <Manager className="float-left w-[810px] h-fit" SelectedPair={SelectedPair} SelectedInterval={SelectedInterval} SetResult={SetResult} />
+            <Manager
+              SelectedPair={SelectedPair}
+              SelectedInterval={SelectedInterval}
+              T2BCross={T2BCross}
+              B2TCross={B2TCross}
+              StartDate={StartDate}
+              EndDate={EndDate}
+              IndicatorValues={IndicatorValues}
+              SetResult={SetResult}
+              SetT2BCross={SetT2BCross}
+              SetB2TCross={SetB2TCross}
+              SetStartDate={SetStartDate}
+              SetEndDate={SetEndDate}
+              SetIndicatorValues={SetIndicatorValues}
+              className="float-left w-[810px] h-fit"
+            />
             <div className="float-left w-fit h-fit">
-              <IntervalList className="border-2 border-gray-300 h-fit outline-none" SelectedInterval={SelectedInterval} SetSelectedInterval={SetSelectedInterval} />
+              <IntervalList
+                className="border-2 border-gray-300 h-fit outline-none"
+                SelectedInterval={SelectedInterval}
+                SetSelectedInterval={SetSelectedInterval}
+              />
               <br></br>
-              <DownloadButton Result={Result} SelectedPair={SelectedPair} SelectedInterval={SelectedInterval} />
+              <GeneralTests
+                SelectedPair={SelectedPair}
+                SelectedInterval={SelectedInterval}
+                T2BCross={T2BCross}
+                B2TCross={B2TCross}
+                StartDate={StartDate}
+                EndDate={EndDate}
+                IndicatorValues={IndicatorValues}
+                SetResult={SetResult}
+                SetSelectedInterval={SetSelectedInterval}
+              />
             </div>
           </div>
           <br></br>
           <div className="float-left w-fit h-fit">
-            <CandlestickChart className="float-left border-2 border-gray-300" height={500} width={1100} SelectedPair={SelectedPair} SelectedInterval={SelectedInterval} Result={Result} />
+            <CandlestickChart
+              className="float-left border-2 border-gray-300"
+              height={500}
+              width={1100}
+              SelectedPair={SelectedPair}
+              SelectedInterval={SelectedInterval}
+              Result={Result}
+            />
           </div>
           <br></br>
           <div className="float-left w-fit h-fit">

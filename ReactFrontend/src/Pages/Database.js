@@ -7,17 +7,26 @@ import OrderHistory from '../Components/OrderHistory'
 const Page = () => {
   const [ExchangeInfo, SetExchangeInfo] = useState([])
   const [SelectedPair, SetSelectedPair] = useState('BTCUSDT')
+  const [Updater, SetUpdater] = useState(false)
 
   useEffect(() => {
     Api.GetExchangeInfo().then((ExchangeInfo) => {
       SetExchangeInfo(ExchangeInfo.symbols.map((Symbol) => Symbol))
     })
+    SetUpdater(true)
   }, [])
 
   return (
     <>
       <div className="float-left m-5">
-        <PairList className="float-left border-2 border-gray-300  outline-none" SelectedPair={SelectedPair} SetSelectedPair={SetSelectedPair} ExchangeInfo={ExchangeInfo} />
+        <PairList
+          className="float-left border-2 border-gray-300  outline-none"
+          SelectedPair={SelectedPair}
+          SetSelectedPair={SetSelectedPair}
+          ExchangeInfo={ExchangeInfo}
+          Updater={Updater}
+          SetUpdater={SetUpdater}
+        />
         <div className="float-left">
           <div className="float-left w-fit h-fit">
             <GeneralStatistics SelectedPair={SelectedPair} height={400} width={400} />

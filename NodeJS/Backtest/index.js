@@ -44,6 +44,6 @@ module.exports.Backtest = async ({ Symbol, Interval, StartDate, EndDate, Convers
     Result.Statistics.RealizedProfitsSum += order.Profit
   })
 
-  console.log('Backtest => Sonuç = ')
+  console.log('Backtest => Tamamlandı =>', Symbol, Interval, StartDate, EndDate)
   return { Klines, ...Result, CrossesCount }
 }

@@ -60,6 +60,14 @@ const CreateBotOrder = async (Order) => {
     reduceOnly: false
   }
 
+  if (Order.SizePercentMode) {
+    let Balance = (await Binance.Client.futuresAccountBalance()).find((Asset) => Asset.asset === 'USDT')
+    console.log(Order, Balance)
+    if (!Balance) return { error: 'No USDT Balance' }
+
+    Order.Size = Balance.availableBalance * (Order.Size / 100)
+  }
+
   // Limit Order
   if (Order.OrderType === 'Limit') {
     // Set price to last
@@ -168,6 +176,7 @@ const CreateBotOrder = async (Order) => {
 
   let Orders = {}
   Orders.MOrder = await Binance.Client.futuresOrder(MainOrderSettings)
+  console.log(Orders)
 
   if (Order.SLOrder.IsActive) {
     Orders.SLOrder = await Binance.Client.futuresOrder(SLOrderSettings)
@@ -192,7 +201,7 @@ module.exports.StartBot = async ({ Symbol, Interval, ConversionLength, BaseLengt
   if (Bots.some((bot) => bot.Symbol === Symbol)) {
     return { error: 'Symbol has bot' }
   }
-
+  let Result = await CreateBotOrder({ ...Cross1Order, Symbol })
   let BotId = RandomId(40)
   let Calculation = await Binance.StartCalculateIchimoku(Symbol, Interval, ConversionLength, BaseLength, async (CrossType) => {
     let Bot = Bots.find((Bot) => {
@@ -208,6 +217,8 @@ module.exports.StartBot = async ({ Symbol, Interval, ConversionLength, BaseLengt
         BotId,
         Result.Orders.MOrder.orderId,
         Symbol,
+        Interval,
+        '' + ConversionLength + '/' + BaseLength,
         Result.Side,
         Cross1Order.Size,
         Result.Orders.SLOrder ? Result.Orders.SLOrder.stopPrice : -1,
@@ -224,6 +235,8 @@ module.exports.StartBot = async ({ Symbol, Interval, ConversionLength, BaseLengt
         BotId,
         Result.Orders.MOrder.orderId,
         Symbol,
+        Interval,
+        '' + ConversionLength + '/' + BaseLength,
         Result.Side,
         Cross2Order.Size,
         Result.Orders.SLOrder ? Result.Orders.SLOrder.stopPrice : -1,
