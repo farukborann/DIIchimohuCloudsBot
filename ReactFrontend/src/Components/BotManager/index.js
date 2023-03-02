@@ -36,6 +36,7 @@ const BotManager = ({
   ExchangeInfo,
   SetUpdater,
   Bots,
+  Leverage,
   className
 }) => {
   const [IndicatorValues, SetIndicatorValues] = useState({ CLL: 9, BLL: 26 })
@@ -127,6 +128,7 @@ const BotManager = ({
       <Order
         className={'mt-2 border-2 border-slate-300 p-2'}
         Values={T2BCross}
+        Leverage={Leverage}
         SetValues={SetT2BCross}
         SelectedPairExchangeInfo={SelectedPairExchangeInfo}
       />
@@ -138,6 +140,7 @@ const BotManager = ({
       <Order
         className={'mt-2 border-2 border-slate-300 p-2'}
         Values={B2TCross}
+        Leverage={Leverage}
         SetValues={SetB2TCross}
         SelectedPairExchangeInfo={SelectedPairExchangeInfo}
       />
@@ -160,7 +163,8 @@ const BotManager = ({
             ConversionLength: IndicatorValues.CLL,
             BaseLength: IndicatorValues.BLL,
             Cross1Order: T2BCross,
-            Cross2Order: B2TCross
+            Cross2Order: B2TCross,
+            Leverage
           }
           let result = await Api.StartBot(data)
           if (result.error) alert(result.error)

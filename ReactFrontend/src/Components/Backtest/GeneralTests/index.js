@@ -48,7 +48,8 @@ const GeneralTests = ({
               'Toplam Kar/Zarar': Math.round(ProfitSum * 100) / 100,
               'Yüzde Kar/Zarar': Math.round((ProfitSum / Size) * 100 * 100) / 100,
               'Başlangıç Tarihi': format(new Date(StartDate), 'HH:mm dd/MM/yyyy'),
-              'Bitiş Tarihi': format(new Date(EndDate), 'HH:mm dd/MM/yyyy')
+              'Bitiş Tarihi': format(new Date(EndDate), 'HH:mm dd/MM/yyyy'),
+              'CLL/BLL': IndicatorValues.CLL + '/' + IndicatorValues.BLL
             })
 
             let StatisticsWS = XLSX_utils.json_to_sheet([

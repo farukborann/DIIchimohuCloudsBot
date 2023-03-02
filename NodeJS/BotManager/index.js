@@ -68,6 +68,8 @@ const CreateBotOrder = async (Order) => {
     Order.Size = Balance.availableBalance * (Order.Size / 100)
   }
 
+  Order.Size *= Order.Leverage > 0 ? Order.Leverage : 1
+
   // Limit Order
   if (Order.OrderType === 'Limit') {
     // Set price to last
@@ -196,12 +198,12 @@ const CreateBotOrder = async (Order) => {
 
 // Cross1Order => Blue cross red
 // Cross2Order => Red cross blue
-module.exports.StartBot = async ({ Symbol, Interval, ConversionLength, BaseLength, Cross1Order, Cross2Order }) => {
+module.exports.StartBot = async ({ Symbol, Interval, ConversionLength, BaseLength, Cross1Order, Cross2Order, Leverage }) => {
   ExchangeInfo = (await Binance.GetExchangeInfo()).symbols
   if (Bots.some((bot) => bot.Symbol === Symbol)) {
     return { error: 'Symbol has bot' }
   }
-  let Result = await CreateBotOrder({ ...Cross1Order, Symbol })
+
   let BotId = RandomId(40)
   let Calculation = await Binance.StartCalculateIchimoku(Symbol, Interval, ConversionLength, BaseLength, async (CrossType) => {
     let Bot = Bots.find((Bot) => {
@@ -212,7 +214,7 @@ module.exports.StartBot = async ({ Symbol, Interval, ConversionLength, BaseLengt
     // Wait for filling cancel order
     await new Promise((resolve) => setTimeout(resolve, 200))
     if (CrossType === 1) {
-      let Result = await CreateBotOrder({ ...Cross1Order, Symbol })
+      let Result = await CreateBotOrder({ ...Cross1Order, Symbol, Leverage })
       await Database.AddOrder(
         BotId,
         Result.Orders.MOrder.orderId,
@@ -229,7 +231,7 @@ module.exports.StartBot = async ({ Symbol, Interval, ConversionLength, BaseLengt
       Bot.Logs.push({ Date: Now, Cross: 1 })
       Logs.push({ Symbol, Date: Now, Cross: 1 })
     } else if (CrossType === 2) {
-      let Result = await CreateBotOrder({ ...Cross2Order, Symbol })
+      let Result = await CreateBotOrder({ ...Cross2Order, Symbol, Leverage })
 
       await Database.AddOrder(
         BotId,
@@ -249,7 +251,7 @@ module.exports.StartBot = async ({ Symbol, Interval, ConversionLength, BaseLengt
     }
   })
 
-  Bots.push({ BotId, Symbol, Interval, ConversionLength, BaseLength, Cross1Order, Cross2Order, Calculation, Logs: [] })
+  Bots.push({ BotId, Symbol, Interval, ConversionLength, BaseLength, Cross1Order, Cross2Order, Leverage, Calculation, Logs: [] })
   return { result: true }
 }
 

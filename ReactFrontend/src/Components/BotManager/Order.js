@@ -1,6 +1,6 @@
 import React from 'react'
 
-const Order = ({ Values, SetValues, className }) => {
+const Order = ({ Values, Leverage, SetValues, className }) => {
   return (
     <div className={className}>
       <select // Limit Market Select
@@ -45,6 +45,7 @@ const Order = ({ Values, SetValues, className }) => {
         min={Values.MinSize}
         className="ml-2 border-2 border-gray-300"
         onChange={(e) => {
+          let _Leverage = Leverage ?? 1
           SetValues({ ...Values, Size: e.target.value })
         }}
       ></input>

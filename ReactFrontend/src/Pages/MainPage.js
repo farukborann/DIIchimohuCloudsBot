@@ -13,6 +13,7 @@ const Page = () => {
   const [ExchangeInfo, SetExchangeInfo] = useState([])
   const [SelectedPair, SetSelectedPair] = useState('BTCUSDT')
   const [SelectedInterval, SetSelectedInterval] = useState('1m')
+  const [Leverage, SetLeverage] = useState(1)
   const [Bots, SetBots] = useState([])
 
   const [ManuelUpdater, SetManuelUpdater] = useState(false)
@@ -85,6 +86,7 @@ const Page = () => {
               SetUpdater={SetAutoUpdater}
               Bots={Bots}
               ExchangeInfo={ExchangeInfo}
+              Leverage={Leverage}
             />
             <div className="float-left w-[810px] h-auto">
               <BotsLogs
@@ -99,6 +101,8 @@ const Page = () => {
               className="float-left w-fit h-fit"
               SelectedPair={SelectedPair}
               Updater={ManuelUpdater}
+              Leverage={Leverage}
+              SetLeverage={SetLeverage}
               SetUpdater={SetManuelUpdater}
             />
           </div>

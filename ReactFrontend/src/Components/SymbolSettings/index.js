@@ -1,21 +1,31 @@
 import Api from '../../Others/Api'
 import { useEffect, useState } from 'react'
 
-const SymbolSettings = ({ SelectedPair, Updater, SetUpdater, className }) => {
-  const [Leverage, SetLeverage] = useState(1)
+const SymbolSettings = ({
+  SelectedPair,
+  Leverage,
+  SetLeverage,
+  Updater,
+  SetUpdater,
+  className
+}) => {
+  // const [Leverage, SetLeverage] = useState(1)
   const [MaxLeverage, SetMaxLeverage] = useState(1)
   const [MarginMode, SetMarginMode] = useState('')
+  const [ManualLevrageMode, SetManualLevrageMode] = useState(false)
 
   const Update = async () => {
     if (!SelectedPair) return
 
     let SymbolSettings = await Api.GetSymbolSettings({ Symbol: SelectedPair })
+    console.log(SymbolSettings)
     SetLeverage(SymbolSettings.CurrentLeverage)
     SetMaxLeverage(SymbolSettings.MaxLeverage)
     SetMarginMode(SymbolSettings.MarginMode)
   }
 
   useEffect(() => {
+    SetManualLevrageMode(false)
     Update()
   }, [SelectedPair])
 
@@ -55,9 +65,21 @@ const SymbolSettings = ({ SelectedPair, Updater, SetUpdater, className }) => {
       ></input>
       <label className="ml-4">{Leverage + ' '}</label>
       <br></br>
+      <input
+        type="checkbox"
+        checked={ManualLevrageMode}
+        className="ml-4"
+        onChange={(e) => {
+          SetManualLevrageMode(e.target.checked)
+          SetMaxLeverage(125)
+          if (!e.target.checked) Update()
+        }}
+      ></input>
+      <label className="ml-4">Manual Leverage</label>
       <br></br>
       <button
         className="float-right border-2 border-gray-300 p-2"
+        disabled={ManualLevrageMode}
         onClick={async () => {
           await Api.SetSymbolSettings({ Symbol: SelectedPair, Leverage, MarginMode })
           SetUpdater(true)

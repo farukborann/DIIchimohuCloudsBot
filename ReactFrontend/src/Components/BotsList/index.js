@@ -1,7 +1,15 @@
 import Api from '../../Others/Api'
 import { useEffect } from 'react'
 
-const BotsList = ({ Updater, SetUpdater, SetSelectedPair, SetSelectedInterval, Bots, SetBots, className }) => {
+const BotsList = ({
+  Updater,
+  SetUpdater,
+  SetSelectedPair,
+  SetSelectedInterval,
+  Bots,
+  SetBots,
+  className
+}) => {
   const Update = async () => {
     let _Bots = await Api.GetAllBots()
     SetBots(_Bots)
@@ -23,6 +31,7 @@ const BotsList = ({ Updater, SetUpdater, SetSelectedPair, SetSelectedInterval, B
             <th>Symbol</th>
             <th>Interval</th>
             <th>CLL/BLL</th>
+            <th>Leverage</th>
             <th>T2B Cross Price</th>
             <th>B2T Cross Price</th>
             <th>Stop</th>
@@ -39,6 +48,7 @@ const BotsList = ({ Updater, SetUpdater, SetSelectedPair, SetSelectedInterval, B
                   <td className="text-center">
                     {Bot.ConversionLength}/{Bot.BaseLength}
                   </td>
+                  <td className="text-center">{Bot.Leverage}</td>
                   <td className="text-center">{Bot.Cross1Order.Price}</td>
                   <td className="text-center">{Bot.Cross2Order.Price}</td>
                   <td className="text-center">
