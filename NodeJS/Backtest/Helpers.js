@@ -180,14 +180,15 @@ module.exports.CalculateOrders = (Klines, Cross1Order, Cross2Order) => {
       // New Order
       LastOrder = Klines[i].indicatorStatus === 1 ? JSON.parse(JSON.stringify(Cross1Order)) : Klines[i].indicatorStatus === 2 ? JSON.parse(JSON.stringify(Cross2Order)) : undefined
       LastOrder.OpenDate = Klines[i].openTime
+
+      let LastOrderReverseSide = Klines[i].indicatorStatus === 1 ? Cross2Order : Cross1Order
+      if (LastOrderReverseSide.SizePercentMode && AllOrders.length) LastOrder.Size = AllOrders.at(-1).Size + AllOrders.at(-1).Profit
       SetLastOrderPercentModeAndLastPrice(Klines[i].close)
     }
   }
 
-  let TotalProfit = 0
-  AllOrders.forEach((Order) => {
-    TotalProfit += Order.Profit
-  })
+  let LastSize = AllOrders.length ? AllOrders.at(-1).Size + AllOrders.at(-1).Profit : 0
+  let TotalProfit = LastSize - Cross1Order.Size
 
   return { AllOrders, TotalProfit }
 }

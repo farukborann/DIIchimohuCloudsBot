@@ -37,12 +37,8 @@ module.exports.Backtest = async ({ Symbol, Interval, StartDate, EndDate, Convers
     ProfitedOrderCount: Result.AllOrders.filter((order) => order.Profit > 0).length,
     LossedOrderCount: Result.AllOrders.filter((order) => order.Profit < 0).length,
     OrderCount: Result.AllOrders.length,
-    RealizedProfitsSum: 0
+    RealizedProfitsSum: Result.TotalProfit
   }
-
-  Result.AllOrders.forEach((order) => {
-    Result.Statistics.RealizedProfitsSum += order.Profit
-  })
 
   console.log('Backtest => Tamamlandı =>', Symbol, Interval, StartDate, EndDate)
   return { Klines, ...Result, CrossesCount }
