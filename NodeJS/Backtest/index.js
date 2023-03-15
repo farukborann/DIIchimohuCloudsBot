@@ -40,6 +40,8 @@ module.exports.Backtest = async ({ Symbol, Interval, StartDate, EndDate, Convers
     RealizedProfitsSum: Result.TotalProfit
   }
 
+  Result.Statistics.WinRate = (Result.Statistics.ProfitedOrderCount / Result.AllOrders.length) * 100
+
   console.log('Backtest => Tamamlandı =>', Symbol, Interval, StartDate, EndDate)
   return { Klines, ...Result, CrossesCount }
 }

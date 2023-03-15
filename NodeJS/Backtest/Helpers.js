@@ -178,6 +178,13 @@ module.exports.CalculateOrders = (Klines, Cross1Order, Cross2Order) => {
       }
 
       // New Order
+      if (LastOrder) {
+        if (LastOrder.Side === 'Long' && Klines[i].close > LastOrder.TPOrder.Price) continue
+        else if (LastOrder.Side === 'Long' && Klines[i].close < LastOrder.SLOrder.Price) continue
+        else if (LastOrder.Side === 'Short' && Klines[i].close < LastOrder.TPOrder.Price) continue
+        else if (LastOrder.Side === 'Short' && Klines[i].close > LastOrder.SLOrder.Price) continue
+      }
+
       LastOrder = Klines[i].indicatorStatus === 1 ? JSON.parse(JSON.stringify(Cross1Order)) : Klines[i].indicatorStatus === 2 ? JSON.parse(JSON.stringify(Cross2Order)) : undefined
       LastOrder.OpenDate = Klines[i].openTime
 
@@ -187,8 +194,14 @@ module.exports.CalculateOrders = (Klines, Cross1Order, Cross2Order) => {
     }
   }
 
-  let LastSize = AllOrders.length ? AllOrders.at(-1).Size + AllOrders.at(-1).Profit : 0
-  let TotalProfit = LastSize - Cross1Order.Size
+  let TotalProfit
+  if (Cross1Order.SizePercentMode || Cross2Order.SizePercentMode) {
+    let LastSize = AllOrders.length ? AllOrders.at(-1).Size + AllOrders.at(-1).Profit : 0
+    TotalProfit = LastSize - Cross1Order.Size
+  } else {
+    TotalProfit = 0
+    AllOrders.forEach((order) => (TotalProfit += order.Profit))
+  }
 
   return { AllOrders, TotalProfit }
 }
