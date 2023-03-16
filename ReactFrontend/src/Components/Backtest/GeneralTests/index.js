@@ -1,7 +1,7 @@
 import React from 'react'
 import Api from '../../../Others/Api'
 import { format } from 'date-fns'
-import { utils as XLSX_utils, writeFile as XLSX_writeFile } from 'xlsx'
+import { utils as XLSX_utils, writeFileXLSX as XLSX_writeFile } from 'xlsx'
 
 const GeneralTests = ({
   SelectedPair,
@@ -17,7 +17,7 @@ const GeneralTests = ({
     <button
       className="p-2 border-2 border-gray-300 outline-none"
       onClick={async (e) => {
-        let Intervals = ['3m', '5m', '15m', '30m', '1h', '2h', '4m']
+        let Intervals = ['3m', '5m', '15m', '30m', '1h', '2h', '4h']
 
         let WB = XLSX_utils.book_new()
         let GeneralStatistics = []
@@ -40,13 +40,17 @@ const GeneralTests = ({
 
           if (Result) {
             SetResult(Result)
-            let ProfitSum = Math.round(Result.Statistics.RealizedProfitsSum * 100000000) / 100000000
+            let ProfitSum =
+              Math.round(Result.Statistics.RealizedProfitsSum ?? 0 * 100000000) / 100000000
             let Size = Result.AllOrders.length ? Result.AllOrders[0].Size : 0
 
             GeneralStatistics.push({
               Interval,
               'Toplam Kar/Zarar': Math.round(ProfitSum * 100) / 100,
               'Yüzde Kar/Zarar': Math.round((ProfitSum / Size) * 100 * 100) / 100,
+              'Karlı İşlem Sayısı': Result.Statistics.ProfitedOrderCount ?? 0,
+              'Zararlı İşlem Sayısı': Result.Statistics.LossedOrderCount ?? 0,
+              'Win Rate': Math.round(Result.Statistics.WinRate ?? 0 * 100) / 100,
               'Başlangıç Tarihi': format(new Date(StartDate), 'HH:mm dd/MM/yyyy'),
               'Bitiş Tarihi': format(new Date(EndDate), 'HH:mm dd/MM/yyyy'),
               'CLL/BLL': IndicatorValues.CLL + '/' + IndicatorValues.BLL
@@ -74,7 +78,7 @@ const GeneralTests = ({
                   Side: Order.Side,
                   Size: Order.Size,
                   OpenPrice: Order.Price,
-                  ClosePrice: Order.ClosePrice,
+                  ClosePrice: Order.ClosePrice ?? '-',
                   CloseType: Order.CloseType,
                   OpenDate: format(new Date(Order.OpenDate), 'HH:mm dd/MM/yyyy'),
                   CloseDate: format(new Date(Order.CloseDate), 'HH:mm dd/MM/yyyy'),
