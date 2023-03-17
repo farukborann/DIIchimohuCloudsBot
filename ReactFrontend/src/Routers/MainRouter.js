@@ -1,5 +1,6 @@
 import { Navigate, useRoutes } from 'react-router-dom'
-import MainPage from '../Pages/MainPage'
+import Main from '../Pages/Main'
+import Bot from '../Pages/Bot'
 import Database from '../Pages/Database'
 import Backtest from '../Pages/Backtest'
 
@@ -7,7 +8,11 @@ const Router = () => {
   return useRoutes([
     {
       path: '/',
-      element: <MainPage />
+      element: <Main />
+    },
+    {
+      path: '/bot',
+      element: <Bot />
     },
     {
       path: '/database',
